@@ -2,10 +2,14 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FormEvent, ReactNode, useMemo, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import propertyFixtures from "./data/properties.json";
 
 type Rebate = { id: string; title: string; percent: number; reason: string };
 type Penalty = { startDate: string; rate: number; months: number; reason: string } | null;
+type HistoryEntry = { fy: string; amount: number; status: string };
+type PayMode = "UPI" | "Card" | "Net Banking";
+type PaymentResult = { reference: string; amount: number; mode: PayMode; timestamp: string; fy: string };
 type Property = {
   id: string;
   label: string;
@@ -28,6 +32,7 @@ type Property = {
   dueDate: string;
   status: string;
   billDate: string;
+  history: HistoryEntry[];
 };
 
 type Line = {
@@ -75,6 +80,16 @@ function calc(property: Property) {
   return { areaValue, usageValue, ageValue, occupancyValue, coreTax, applied, rebateTotal, beforePenalty, penaltyAmount, unclaimed, due: beforePenalty + penaltyAmount };
 }
 
+// Display-only decomposition of the existing annual property tax (coreTax) into
+// base tax + two earmarked cesses. `base` is the remainder so the three parts
+// always sum to exactly coreTax — this changes no calculation, only presentation.
+function cessSplit(amounts: ReturnType<typeof calc>) {
+  const library = Math.round(amounts.occupancyValue * 0.01);
+  const health = Math.round(amounts.occupancyValue * 0.01);
+  const base = amounts.coreTax - library - health;
+  return { base, library, health };
+}
+
 function Arrow({ direction = "right" }: { direction?: "right" | "down" | "up" }) {
   const rotation = direction === "down" ? 90 : direction === "up" ? -90 : 0;
   return <span aria-hidden="true" className="inline-flex h-[1.15em] w-[1.15em] items-center justify-center" style={{ transform: `rotate(${rotation}deg)` }}>→</span>;
@@ -96,7 +111,7 @@ function PrototypeNote({ compact = false }: { compact?: boolean }) {
   return (
     <aside className={`prototype-note ${compact ? "prototype-note-compact" : ""}`} aria-label="Prototype disclosure">
       <Icon name="shield" />
-      <p><strong>Independent hackathon prototype.</strong> This is not a government product. All property data and calculations are mock and synthetic. Payment is simulated; no transaction occurs. Bill explanations and dispute intake work today; municipal verification is mocked.</p>
+      <p><strong>Independent hackathon prototype.</strong> This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations, cess splits and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.</p>
     </aside>
   );
 }
@@ -173,11 +188,16 @@ function Stat({ label, children }: { label: string; children: ReactNode }) {
   return <div className="property-stat"><dt>{label}</dt><dd>{children}</dd></div>;
 }
 
-function BillSummary({ property, onExplain, onPay, onDispute, paid }: { property: Property; onExplain: () => void; onPay: () => void; onDispute: () => void; paid: boolean }) {
+function BillSummary({ property, onExplain, onPay, onDispute, paid, lastPayment }: { property: Property; onExplain: () => void; onPay: () => void; onDispute: () => void; paid: boolean; lastPayment: PaymentResult | null }) {
   const amounts = useMemo(() => calc(property), [property]);
   const hasSaving = amounts.unclaimed.length > 0;
   const savingTotal = amounts.unclaimed.reduce((total, rebate) => total + rebate.amount, 0);
   const isOverdue = property.penalty !== null;
+  const currentStatus = paid ? "Paid (simulated)" : isOverdue ? "Overdue" : "Due";
+  const historyRows = [
+    { fy: "2025–26", amount: paid ? (lastPayment?.amount ?? amounts.due) : amounts.due, status: currentStatus, current: true },
+    ...property.history.map((entry) => ({ ...entry, current: false })),
+  ];
 
   return (
     <>
@@ -196,7 +216,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, paid }: { property
           <div className="amount-panel">
             <span>{paid ? "Paid (simulated)" : "Amount due"}</span>
             <strong>{rupees(amounts.due)}</strong>
-            <small>{paid ? "No real payment was processed." : <>Due by <b>{property.dueDate}</b></>}</small>
+            <small>{paid ? (lastPayment ? <>Simulated via {lastPayment.mode} · <b>{lastPayment.reference}</b></> : "No real payment was processed.") : <>Due by <b>{property.dueDate}</b></>}</small>
           </div>
         </section>
 
@@ -206,6 +226,23 @@ function BillSummary({ property, onExplain, onPay, onDispute, paid }: { property
         <section className="summary-grid" aria-label="Bill summary details">
           <div className="summary-card summary-info"><span className="summary-card-label">Bill details</span><dl><Stat label="Bill period">1 Apr 2025 – 31 Mar 2026</Stat><Stat label="Issued on">{property.billDate}</Stat><Stat label="Due date">{property.dueDate}</Stat><Stat label="Property use">{property.usage}</Stat></dl></div>
           <div className="summary-card summary-action"><span className="summary-card-label">Before you pay</span><h2>Understand every rupee first.</h2><p>See the exact property details, calculation rules, rebates and any late fee that created this amount.</p><button className="button button-dark button-large" type="button" onClick={onExplain}>Why this amount? <Arrow /></button></div>
+        </section>
+
+        <section className="payment-history" aria-labelledby="history-title">
+          <div className="history-head"><h2 id="history-title">Payment history</h2><span>Property {property.id} · last {property.history.length + 1} years</span></div>
+          <ol className="history-list">
+            {historyRows.map((row) => {
+              const state = row.status.toLowerCase().startsWith("paid") ? "paid" : row.status.toLowerCase() === "overdue" ? "overdue" : "pending";
+              return (
+                <li key={row.fy} className={`history-row ${row.current ? "is-current" : ""}`}>
+                  <span className="history-fy">{row.fy}{row.current && <em>Current</em>}</span>
+                  <span className="history-amount">{rupees(row.amount)}</span>
+                  <span className={`history-status status-${state}`}>{row.status}</span>
+                </li>
+              );
+            })}
+          </ol>
+          <p className="muted-copy">Synthetic record for this prototype — the portal has no connection to a real municipal ledger.</p>
         </section>
       </main>
       <BottomActions onExplain={onExplain} onPay={onPay} onDispute={onDispute} paid={paid} />
@@ -237,13 +274,17 @@ function DetailCard({ title, children, tone }: { title: string; children: ReactN
 
 function Breakdown({ property, onBack, onPay, onDispute }: { property: Property; onBack: () => void; onPay: () => void; onDispute: (line?: string) => void }) {
   const amounts = useMemo(() => calc(property), [property]);
+  const cess = useMemo(() => cessSplit(amounts), [amounts]);
   const [openLine, setOpenLine] = useState<string | null>(null);
+  const ratePct = (property.taxRate * 100).toFixed(0);
   const formulaLines: Line[] = [
     { id: "area", label: "Built-up area", amount: amounts.areaValue, helper: `${property.builtUpArea} m² × ${rupees(property.uav)}/m²/month × 12 months`, detail: <p>Your recorded built-up area is <b>{property.builtUpArea} square metres</b>. The zone’s published unit-area value is {rupees(property.uav)} per square metre per month. Together, they produce an annual assessed value of {rupees(amounts.areaValue)} before property-specific factors.</p> },
     { id: "usage", label: `${property.usage} use factor`, amount: amounts.usageValue, helper: `Assessed value × ${property.usageFactor.toFixed(2)}`, detail: <p>The use factor adjusts the rate for how the property is used. <b>{property.usage}</b> in this prototype uses a factor of {property.usageFactor.toFixed(2)}, so the assessed value is {rupees(amounts.usageValue)}.</p> },
     { id: "age", label: `${property.age}-year building age factor`, amount: amounts.ageValue, helper: `Adjusted value × ${property.ageFactor.toFixed(2)}`, detail: <p>Buildings in the <b>{property.age}-year-old</b> bracket receive a {Math.round((1 - property.ageFactor) * 100)}% depreciation adjustment. The age factor is {property.ageFactor.toFixed(2)}, producing {rupees(amounts.ageValue)}. This reduces the assessed value because the building is not new.</p> },
     { id: "occupancy", label: `${property.occupancy} factor`, amount: amounts.occupancyValue, helper: `Adjusted value × ${property.occupancyFactor.toFixed(2)}`, detail: <p>The record says this property is <b>{property.occupancy.toLowerCase()}</b>. The matching occupancy factor is {property.occupancyFactor.toFixed(2)}, giving a final assessed value of {rupees(amounts.occupancyValue)}.</p> },
-    { id: "base-tax", label: "Annual property tax", amount: amounts.coreTax, helper: `${rupees(amounts.occupancyValue)} × ${(property.taxRate * 100).toFixed(0)}% tax rate`, detail: <p>The prototype applies a {(property.taxRate * 100).toFixed(0)}% annual municipal tax rate to the final assessed value. That produces the tax amount before rebates or late-payment charges: <b>{rupees(amounts.coreTax)}</b>.</p> },
+    { id: "base-tax", label: "Base property tax", amount: cess.base, helper: `Core municipal tax on ${rupees(amounts.occupancyValue)} assessed value`, detail: <p>The core municipal property tax on your final assessed value of {rupees(amounts.occupancyValue)}. A real bill folds this into one {ratePct}% headline rate; here it is that rate <b>minus</b> the two earmarked cesses below — not an extra charge. It comes to <b>{rupees(cess.base)}</b>.</p> },
+    { id: "library-cess", label: "Library cess", amount: cess.library, helper: "≈1% of assessed value", detail: <p>A fixed levy funding public libraries in your ward — applied to every property regardless of usage. Municipal bills bundle it into the headline tax rate and never itemise it; this prototype shows it on its own line: <b>{rupees(cess.library)}</b>.</p> },
+    { id: "health-cess", label: "Health cess", amount: cess.health, helper: "≈1% of assessed value", detail: <p>A fixed levy funding municipal primary health centres and sanitation drives — also applied to every property regardless of usage, and also hidden inside the headline rate on a real bill: <b>{rupees(cess.health)}</b>. Base property tax plus both cesses equals your {rupees(amounts.coreTax)} annual property tax.</p> },
   ];
   const summaryLines: Line[] = [
     ...(property.penalty ? [{ id: "penalty", label: "Late-payment charge", amount: amounts.penaltyAmount, sign: "plus" as const, helper: `${property.penalty.rate}% per month for ${property.penalty.months} months`, attention: "warning" as const, detail: <p>{property.penalty.reason} From <b>{property.penalty.startDate}</b>, a {property.penalty.rate}% monthly charge applies to the unpaid bill after rebates ({rupees(amounts.beforePenalty)}). After {property.penalty.months} months, it has accumulated to <b>{rupees(amounts.penaltyAmount)}</b>.</p> }] : []),
@@ -260,7 +301,7 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
 
         <section className="record-section" aria-labelledby="record-title"><div className="section-heading"><span>01</span><div><h2 id="record-title">Property details used</h2><p>These are the facts the calculation starts with.</p></div></div><dl className="facts-grid"><Stat label="Built-up area">{property.builtUpArea} m²</Stat><Stat label="Zone">{property.zone}</Stat><Stat label="Usage">{property.usage}</Stat><Stat label="Building age">{property.age} years</Stat><Stat label="Occupancy">{property.occupancy}</Stat><Stat label="Owner category">{property.ownerCategory}</Stat></dl></section>
 
-        <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">Base calculation</h2><p>We use a unit-area value method—the local value of each square metre, adjusted for the property.</p></div></div><div className="formula-card"><div className="formula-caption">Annual assessed value</div><div className="formula-text"><span>area</span><i>×</i><span>unit-area value</span><i>×</i><span>use</span><i>×</i><span>age</span><i>×</i><span>occupancy</span></div><p>Then the annual tax rate is applied. Here is each step.</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => onDispute(line.label)} />)}</div></section>
+        <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">Base calculation</h2><p>We use a unit-area value method—the local value of each square metre, adjusted for the property.</p></div></div><div className="formula-card"><div className="formula-caption">Annual assessed value</div><div className="formula-text"><span>area</span><i>×</i><span>unit-area value</span><i>×</i><span>use</span><i>×</i><span>age</span><i>×</i><span>occupancy</span></div><p>Then the annual tax rate is applied. Here is each step.</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => onDispute(line.label)} />)}</div><p className="muted-copy">Base property tax, library cess and health cess are a split of the single {ratePct}% municipal rate — a real bill shows only the combined figure. Together they equal your annual property tax of {rupees(amounts.coreTax)}, before any rebate or late-payment charge.</p></section>
 
         <section className="calculation-section" aria-labelledby="adjustments-title"><div className="section-heading"><span>03</span><div><h2 id="adjustments-title">Rebates and charges</h2><p>Items that change the base tax into the amount currently due.</p></div></div>
           {amounts.applied.length > 0 ? <DetailCard title="Already applied"><div className="mini-list">{amounts.applied.map((rebate) => <div key={rebate.id}><span><Icon name="check" />{rebate.title}</span><b>−{rupees(rebate.amount)}</b></div>)}</div></DetailCard> : <DetailCard title="No rebates applied"><p className="muted-copy">There are no deductions recorded on this bill.</p></DetailCard>}
@@ -284,10 +325,68 @@ function Modal({ children, onClose }: { children: ReactNode; onClose: () => void
   return <motion.div className="modal-layer" role="presentation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={reduced ? { duration: 0.12 } : spring} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><motion.section role="dialog" aria-modal="true" className="modal-card" initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.99 }} transition={reduced ? { duration: 0.12 } : spring}>{children}</motion.section></motion.div>;
 }
 
-function PaymentModal({ property, onClose, onPaid }: { property: Property; onClose: () => void; onPaid: () => void }) {
+const PAY_MODES: PayMode[] = ["UPI", "Card", "Net Banking"];
+
+function PaymentModal({ property, onClose, onPaid }: { property: Property; onClose: () => void; onPaid: (result: PaymentResult) => void }) {
   const amounts = calc(property);
-  const [complete, setComplete] = useState(false);
-  return <Modal onClose={onClose}>{complete ? <div className="modal-content success-content"><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />Simulation complete</span><h2>Payment marked as complete.</h2><p>This is a prototype: no money moved and no payment gateway was contacted.</p><button className="button button-dark" onClick={onPaid} type="button">Return to bill <Arrow /></button></div> : <div className="modal-content"><button className="modal-close" onClick={onClose} type="button" aria-label="Close payment"><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />Mock payment</span><h2>Confirm simulated payment</h2><p>You are about to simulate payment of the amount due. This will not open a bank page or process a transaction.</p><div className="payment-amount"><span>Amount to simulate</span><strong>{rupees(amounts.due)}</strong></div><button className="button button-primary button-full" onClick={() => setComplete(true)} type="button">Simulate payment <Arrow /></button><button className="modal-cancel" onClick={onClose} type="button">Cancel</button></div>}</Modal>;
+  const [mode, setMode] = useState<PayMode>("UPI");
+  const [receipt, setReceipt] = useState<PaymentResult | null>(null);
+
+  function simulate() {
+    setReceipt({
+      reference: `RCT-${property.id.slice(-4)}-260829`,
+      amount: amounts.due,
+      mode,
+      fy: "2025–26",
+      timestamp: new Date().toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }) + " IST",
+    });
+  }
+
+  return (
+    <Modal onClose={onClose}>
+      {receipt ? (
+        <div className="modal-content receipt-content">
+          <button className="modal-close" onClick={onClose} type="button" aria-label="Close receipt"><Icon name="close" /></button>
+          <div className="success-icon"><Icon name="check" /></div>
+          <span className="eyebrow"><span className="eyebrow-dot" />Simulation complete</span>
+          <h2>Simulated via {receipt.mode}.</h2>
+          <p>No money moved and no payment gateway was contacted.</p>
+          <div className="receipt-card">
+            <div className="receipt-qr"><QRCodeSVG value={receipt.reference} size={116} level="M" bgColor="#f7f8f5" fgColor="#17231e" title={`Receipt ${receipt.reference}`} /><small>Encodes the receipt number only</small></div>
+            <dl className="receipt-rows">
+              <div><dt>Receipt number</dt><dd>{receipt.reference}</dd></div>
+              <div><dt>Financial year</dt><dd>{receipt.fy}</dd></div>
+              <div><dt>Property ID</dt><dd>{property.id}</dd></div>
+              <div><dt>Amount paid</dt><dd>{rupees(receipt.amount)}</dd></div>
+              <div><dt>Payment mode</dt><dd>{receipt.mode}</dd></div>
+              <div><dt>Timestamp</dt><dd>{receipt.timestamp}</dd></div>
+            </dl>
+          </div>
+          <p className="receipt-disclaimer"><Icon name="shield" /> Mock receipt — for prototype demonstration only, not valid proof of payment.</p>
+          <button className="button button-dark button-full" onClick={() => onPaid(receipt)} type="button">Return to bill <Arrow /></button>
+        </div>
+      ) : (
+        <div className="modal-content">
+          <button className="modal-close" onClick={onClose} type="button" aria-label="Close payment"><Icon name="close" /></button>
+          <span className="eyebrow"><span className="eyebrow-dot" />Mock payment</span>
+          <h2>Confirm simulated payment</h2>
+          <p>You are about to simulate payment of the amount due. This will not open a bank page or process a transaction.</p>
+          <div className="payment-amount"><span>Amount to simulate</span><strong>{rupees(amounts.due)}</strong></div>
+          <fieldset className="pay-modes">
+            <legend>Payment method</legend>
+            {PAY_MODES.map((m) => (
+              <label key={m} className={`pay-mode ${mode === m ? "is-selected" : ""}`}>
+                <input type="radio" name="pay-mode" value={m} checked={mode === m} onChange={() => setMode(m)} />
+                <span>{m}</span>
+              </label>
+            ))}
+          </fieldset>
+          <button className="button button-primary button-full" onClick={simulate} type="button">Simulate payment <Arrow /></button>
+          <button className="modal-cancel" onClick={onClose} type="button">Cancel</button>
+        </div>
+      )}
+    </Modal>
+  );
 }
 
 function DisputeModal({ property, initialLine, resetKey, onClose }: { property: Property; initialLine?: string; resetKey: number; onClose: () => void }) {
@@ -302,7 +401,7 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
     setCopied(false);
   }
   const reference = `DPT-${property.id.slice(-4)}-260829`;
-  const lines = ["Built-up area", `${property.usage} use factor`, `${property.age}-year building age factor`, `${property.occupancy} factor`, "Annual property tax", "Applied rebate", "Late-payment charge", "Amount due"];
+  const lines = ["Built-up area", `${property.usage} use factor`, `${property.age}-year building age factor`, `${property.occupancy} factor`, "Base property tax", "Library cess", "Health cess", "Annual property tax", "Applied rebate", "Late-payment charge", "Amount due"];
   const reason = `I would like the ${line.toLowerCase()} on property ${property.id} to be reviewed. I believe the information or rule used may be incorrect.`;
   return <Modal onClose={onClose}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label="Close confirmation"><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />Dispute recorded</span><h2>Your review request is ready.</h2><p>We have attached the exact bill line you chose: <b>{line}</b>.</p><div className="reference-box"><span>Reference number</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? "Copied" : "Copy"}</button></div><div className="timeline"><div><b>Within 2 working days</b><span>A record-check team reviews the property detail and rule.</span></div><div><b>Within 7 working days</b><span>You receive the mocked outcome and any corrected bill.</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">Done <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label="Close dispute"><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />Raise a dispute</span><h2>Start with the line you’re questioning.</h2><p>Your request is pre-filled so a reviewer knows exactly what to check.</p><label htmlFor="dispute-line">Bill line to review</label><select id="dispute-line" value={line} onChange={(event) => setLine(event.target.value)}>{lines.map((item) => <option key={item}>{item}</option>)}</select><label htmlFor="dispute-reason">What should be checked</label><textarea id="dispute-reason" key={line} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>Attached automatically</b><small>Property ID, selected line, and this bill’s calculation context.</small></span></div><button className="button button-primary button-full" type="submit">Submit review request <Arrow /></button><p className="form-footnote">Prototype only—no request is sent to a municipal office.</p></form>}</Modal>;
 }
@@ -314,10 +413,11 @@ export default function Home() {
   const [disputeLine, setDisputeLine] = useState<string | undefined>();
   const [disputeKey, setDisputeKey] = useState(0);
   const [paid, setPaid] = useState(false);
+  const [lastPayment, setLastPayment] = useState<PaymentResult | null>(null);
 
-  function selectProperty(next: Property) { setProperty(next); setScreen("bill"); setPaid(false); setModal(null); }
+  function selectProperty(next: Property) { setProperty(next); setScreen("bill"); setPaid(false); setLastPayment(null); setModal(null); }
   function openDispute(line?: string) { setDisputeLine(line); setDisputeKey((n) => n + 1); setModal("dispute"); }
 
   if (!property) return <Lookup onChoose={selectProperty} />;
-  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} onExplain={() => setScreen("breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} /> : <Breakdown property={property} onBack={() => setScreen("bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={() => { setModal(null); setPaid(true); setScreen("bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
+  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => setScreen("breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} /> : <Breakdown property={property} onBack={() => setScreen("bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPaid(true); setLastPayment(result); setScreen("bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
 }

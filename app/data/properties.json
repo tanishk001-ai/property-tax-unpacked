@@ -23,7 +23,11 @@
     "penalty": null,
     "dueDate": "31 March 2026",
     "status": "Due",
-    "billDate": "1 April 2025"
+    "billDate": "1 April 2025",
+    "history": [
+      { "fy": "2024–25", "amount": 10120, "status": "Paid" },
+      { "fy": "2023–24", "amount": 9680, "status": "Paid" }
+    ]
   },
   {
     "id": "DEMO-7719",
@@ -50,7 +54,11 @@
     "penalty": null,
     "dueDate": "31 March 2026",
     "status": "Due · possible saving found",
-    "billDate": "1 April 2025"
+    "billDate": "1 April 2025",
+    "history": [
+      { "fy": "2024–25", "amount": 15760, "status": "Paid" },
+      { "fy": "2023–24", "amount": 15200, "status": "Paid" }
+    ]
   },
   {
     "id": "DEMO-3982",
@@ -73,6 +81,10 @@
     "penalty": { "startDate": "1 April 2026", "rate": 1, "months": 5, "reason": "The 2025–26 bill remained unpaid after its 31 March 2026 due date." },
     "dueDate": "31 March 2026",
     "status": "Overdue",
-    "billDate": "1 April 2025"
+    "billDate": "1 April 2025",
+    "history": [
+      { "fy": "2024–25", "amount": 21050, "status": "Paid" },
+      { "fy": "2023–24", "amount": 20240, "status": "Paid" }
+    ]
   }
 ]
