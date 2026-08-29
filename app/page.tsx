@@ -10,11 +10,20 @@ type Penalty = { startDate: string; rate: number; months: number; reason: string
 type HistoryEntry = { fy: string; amount: number; status: string };
 type PayMode = "UPI" | "Card" | "Net Banking";
 type PaymentResult = { reference: string; amount: number; mode: PayMode; timestamp: string; fy: string };
+type Address = { houseNo: string; street: string; locality: string; ward: string; city: string; pincode: string };
+type Relation = "S/O" | "D/O" | "W/O";
 type Property = {
   id: string;
   label: string;
   tone: "clear" | "rebate" | "penalty";
-  address: string;
+  address: Address;
+  khataNumber: string;
+  surveyNumber: string;
+  ward: string;
+  guidelineRate: number;
+  ownerName: string;
+  relation: Relation;
+  relationName: string;
   zone: string;
   usage: string;
   occupancy: string;
@@ -55,6 +64,12 @@ const money = new Intl.NumberFormat("en-IN", {
 
 function rupees(value: number) {
   return money.format(Math.round(value));
+}
+
+const RELATION_HI: Record<Relation, string> = { "S/O": "पुत्र", "D/O": "पुत्री", "W/O": "पत्नी" };
+
+function formatAddress(a: Address) {
+  return `${a.houseNo}, ${a.street}, ${a.locality}, ${a.city} — ${a.pincode}`;
 }
 
 function calc(property: Property) {
@@ -214,7 +229,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, last
               {paid ? <Icon name="check" /> : isOverdue ? <Icon name="warning" /> : hasSaving ? <Icon name="spark" /> : <span className="status-dot" />}
               {paid ? (hasSaving ? "Payment simulated · rebate still unclaimed" : "Payment simulated") : property.status}
             </div>
-            <p className="address">{property.address}</p>
+            <p className="address">{formatAddress(property.address)}</p>
             <h1 id="bill-title">Your 2025–26 property tax bill</h1>
           </div>
           <div className="amount-panel">
@@ -303,7 +318,17 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
         <div className="breadcrumb"><button onClick={onBack} type="button">Bill summary</button><Arrow /> <span>Why this amount?</span></div>
         <section className="explain-intro"><div><span className="eyebrow"><span className="eyebrow-dot" />Your bill, unpacked</span><h1>Here’s how {rupees(amounts.due)} was calculated.</h1><p>Tap any line to see the rule behind it. If an input looks wrong, you can question that exact line.</p></div><div className="explain-total"><span>Amount due</span><strong>{rupees(amounts.due)}</strong><small>Due {property.dueDate}</small></div></section>
 
-        <section className="record-section" aria-labelledby="record-title"><div className="section-heading"><span>01</span><div><h2 id="record-title">Property details used</h2><p>These are the facts the calculation starts with.</p></div></div><dl className="facts-grid"><Stat label="Built-up area">{property.builtUpArea} m²</Stat><Stat label="Zone">{property.zone}</Stat><Stat label="Usage">{property.usage}</Stat><Stat label="Building age">{property.age} years</Stat><Stat label="Occupancy">{property.occupancy}</Stat><Stat label="Owner category">{property.ownerCategory}</Stat></dl></section>
+        <section className="record-section" aria-labelledby="record-title">
+          <div className="section-heading"><span>01</span><div><h2 id="record-title">Property details used</h2><p>The municipal record for this property, and the facts the calculation starts with.</p></div></div>
+          <dl className="record-list">
+            <div className="record-row"><dt>Khata number</dt><dd>{property.khataNumber}</dd></div>
+            <div className="record-row"><dt>Survey number</dt><dd>{property.surveyNumber}</dd></div>
+            <div className="record-row"><dt>Ward <span className="record-hi" lang="hi">वार्ड</span></dt><dd>{property.ward}</dd></div>
+            <div className="record-row"><dt>Owner name <span className="record-hi" lang="hi">स्वामी का नाम</span></dt><dd>{property.ownerName}<em>{RELATION_HI[property.relation]} {property.relation} {property.relationName}</em></dd></div>
+            <div className="record-row"><dt>Government guideline rate <span className="record-hi" lang="hi">गाइडलाइन दर</span></dt><dd>{rupees(property.guidelineRate)}/m²<em>A separate valuation reference published by the state — it does not affect this bill&apos;s calculation.</em></dd></div>
+          </dl>
+          <dl className="facts-grid"><Stat label="Built-up area">{property.builtUpArea} m²</Stat><Stat label="Zone">{property.zone}</Stat><Stat label="Usage">{property.usage}</Stat><Stat label="Building age">{property.age} years</Stat><Stat label="Occupancy">{property.occupancy}</Stat><Stat label="Owner category">{property.ownerCategory}</Stat></dl>
+        </section>
 
         <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">Base calculation</h2><p>We use a unit-area value method—the local value of each square metre, adjusted for the property.</p></div></div><div className="formula-card"><div className="formula-caption">Annual assessed value</div><div className="formula-text"><span>area</span><i>×</i><span>unit-area value</span><i>×</i><span>use</span><i>×</i><span>age</span><i>×</i><span>occupancy</span></div><p>Then the annual tax rate is applied. Here is each step.</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => onDispute(line.label)} />)}</div><p className="muted-copy">Base property tax, library cess and health cess are a split of the single {ratePct}% municipal rate — a real bill shows only the combined figure. Together they equal your annual property tax of {rupees(amounts.coreTax)}, before any rebate or late-payment charge.</p></section>
 
