@@ -95,7 +95,7 @@ function Arrow({ direction = "right" }: { direction?: "right" | "down" | "up" })
   return <span aria-hidden="true" className="inline-flex h-[1.15em] w-[1.15em] items-center justify-center" style={{ transform: `rotate(${rotation}deg)` }}>→</span>;
 }
 
-function Icon({ name, className = "" }: { name: "check" | "spark" | "warning" | "chevron" | "close" | "shield" | "receipt" | "copy"; className?: string }) {
+function Icon({ name, className = "" }: { name: "check" | "spark" | "warning" | "chevron" | "close" | "shield" | "receipt" | "copy" | "info"; className?: string }) {
   const props = { className: `h-[1.1em] w-[1.1em] ${className}`, fill: "none", stroke: "currentColor", strokeWidth: 1.9, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, viewBox: "0 0 24 24", "aria-hidden": true };
   if (name === "check") return <svg {...props}><path d="m5 12 4.2 4.2L19.5 6" /></svg>;
   if (name === "spark") return <svg {...props}><path d="m12 2 1.7 6.3L20 10l-6.3 1.7L12 18l-1.7-6.3L4 10l6.3-1.7L12 2Z" /><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" /></svg>;
@@ -104,6 +104,7 @@ function Icon({ name, className = "" }: { name: "check" | "spark" | "warning" | 
   if (name === "close") return <svg {...props}><path d="m6 6 12 12M18 6 6 18" /></svg>;
   if (name === "shield") return <svg {...props}><path d="M12 3 19 6v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3Z" /><path d="m9 12 2 2 4-4" /></svg>;
   if (name === "receipt") return <svg {...props}><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" /><path d="M9 8h6M9 12h6" /></svg>;
+  if (name === "info") return <svg {...props}><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 7.6h.01" /></svg>;
   return <svg {...props}><rect x="8" y="8" width="11" height="11" rx="1" /><path d="M16 8V5H5v11h3" /></svg>;
 }
 
@@ -111,7 +112,7 @@ function PrototypeNote({ compact = false }: { compact?: boolean }) {
   return (
     <aside className={`prototype-note ${compact ? "prototype-note-compact" : ""}`} aria-label="Prototype disclosure">
       <Icon name="shield" />
-      <p><strong>Independent hackathon prototype.</strong> This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations, cess splits and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.</p>
+      <p><strong>Independent hackathon prototype.</strong> <a className="prototype-note-link" href="/terms">Full terms</a>. This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations, cess splits and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.</p>
     </aside>
   );
 }
@@ -220,7 +221,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, paid, lastPayment 
           </div>
         </section>
 
-        {hasSaving && <section className="insight-banner saving-banner"><Icon name="spark" /><div><strong>{paid ? "You may have paid more than you needed to." : "You may be paying more than you need to."}</strong><span>{paid ? <>A rebate could have saved {rupees(savingTotal)}—you can still file the declaration for future bills.</> : <>We found a rebate that could save {rupees(savingTotal)}.</>}</span></div><button className="text-button" type="button" onClick={onExplain}>See it <Arrow /></button></section>}
+        {hasSaving && <section className="insight-banner saving-banner"><Icon name="info" /><div><strong>{paid ? "You may have paid more than you needed to." : "You may be paying more than you need to."}</strong><span>{paid ? <>A rebate could have saved {rupees(savingTotal)}—you can still file the declaration for future bills.</> : <>We found a rebate that could save {rupees(savingTotal)}.</>}</span></div><button className="text-button" type="button" onClick={onExplain}>See it <Arrow /></button></section>}
         {isOverdue && !paid && <section className="insight-banner warning-banner"><Icon name="warning" /><div><strong>A late-payment charge is included.</strong><span>See exactly how the {rupees(amounts.penaltyAmount)} penalty was calculated.</span></div><button className="text-button" type="button" onClick={onExplain}>Understand it <Arrow /></button></section>}
 
         <section className="summary-grid" aria-label="Bill summary details">
@@ -269,7 +270,7 @@ function CalculationLine({ line, open, onToggle, onQuestion }: { line: Line; ope
 }
 
 function DetailCard({ title, children, tone }: { title: string; children: ReactNode; tone?: "saving" | "warning" }) {
-  return <section className={`detail-card ${tone ? `detail-${tone}` : ""}`}><div className="detail-card-title">{tone === "saving" ? <Icon name="spark" /> : tone === "warning" ? <Icon name="warning" /> : <Icon name="receipt" />}<h3>{title}</h3></div>{children}</section>;
+  return <section className={`detail-card ${tone ? `detail-${tone}` : ""}`}><div className="detail-card-title">{tone === "saving" ? <Icon name="info" /> : tone === "warning" ? <Icon name="warning" /> : <Icon name="receipt" />}<h3>{title}</h3></div>{children}</section>;
 }
 
 function Breakdown({ property, onBack, onPay, onDispute }: { property: Property; onBack: () => void; onPay: () => void; onDispute: (line?: string) => void }) {
