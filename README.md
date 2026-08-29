@@ -71,5 +71,8 @@ Visit `localhost:3000`, use sample property ID `DEMO-7719` (or `DEMO-2048` /
 
 ## Built by
 
-Tanishk Tiwari, solo — implementation via Codex, directed and debugged
-throughout.
+Tanishk Tiwari, solo. Codex generated the initial implementation from a
+detailed product specification. I directed the build throughout
+scoping the journey, diagnosing and fixing four behavioural bugs in the
+initial build, and specifying every feature added after. Additional AI
+tooling was used for later debugging and iteration.
