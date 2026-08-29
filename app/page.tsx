@@ -90,8 +90,8 @@ function cessSplit(amounts: ReturnType<typeof calc>) {
   return { base, library, health };
 }
 
-function Arrow({ direction = "right" }: { direction?: "right" | "down" | "up" }) {
-  const rotation = direction === "down" ? 90 : direction === "up" ? -90 : 0;
+function Arrow({ direction = "right" }: { direction?: "right" | "down" | "up" | "left" }) {
+  const rotation = direction === "down" ? 90 : direction === "up" ? -90 : direction === "left" ? 180 : 0;
   return <span aria-hidden="true" className="inline-flex h-[1.15em] w-[1.15em] items-center justify-center" style={{ transform: `rotate(${rotation}deg)` }}>→</span>;
 }
 
@@ -174,11 +174,14 @@ function Lookup({ onChoose }: { onChoose: (property: Property) => void }) {
   );
 }
 
-function Header({ property, onHome, screen }: { property: Property; onHome: () => void; screen: "bill" | "breakdown" }) {
+function Header({ property, onHome, onBack, screen }: { property: Property; onHome: () => void; onBack: () => void; screen: "bill" | "breakdown" }) {
   return (
     <header className="app-header">
       <div className="page-width header-inner">
-        <button type="button" className="brand brand-button" onClick={onHome} aria-label="Back to property lookup"><span>Unpacked</span></button>
+        <div className="header-nav">
+          <button type="button" className="back-button" onClick={onBack} aria-label={screen === "breakdown" ? "Back to bill summary" : "Back to all properties"}><Arrow direction="left" />Back</button>
+          <button type="button" className="brand brand-button" onClick={onHome} aria-label="Back to property lookup"><span>Unpacked</span></button>
+        </div>
         <div className="property-pill"><span className="pill-label">Property</span><strong>{property.id}</strong><span className="pill-separator" /><span className="pill-view">{screen === "bill" ? "Bill" : "Explanation"}</span></div>
       </div>
     </header>
@@ -189,7 +192,7 @@ function Stat({ label, children }: { label: string; children: ReactNode }) {
   return <div className="property-stat"><dt>{label}</dt><dd>{children}</dd></div>;
 }
 
-function BillSummary({ property, onExplain, onPay, onDispute, paid, lastPayment }: { property: Property; onExplain: () => void; onPay: () => void; onDispute: () => void; paid: boolean; lastPayment: PaymentResult | null }) {
+function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, lastPayment }: { property: Property; onExplain: () => void; onPay: () => void; onDispute: () => void; onBack: () => void; paid: boolean; lastPayment: PaymentResult | null }) {
   const amounts = useMemo(() => calc(property), [property]);
   const hasSaving = amounts.unclaimed.length > 0;
   const savingTotal = amounts.unclaimed.reduce((total, rebate) => total + rebate.amount, 0);
@@ -202,7 +205,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, paid, lastPayment 
 
   return (
     <>
-      <Header property={property} onHome={() => window.location.reload()} screen="bill" />
+      <Header property={property} onHome={() => window.location.reload()} onBack={onBack} screen="bill" />
       <main className="bill-main page-width">
         <div className="breadcrumb"><button onClick={() => window.location.reload()} type="button">All properties</button><Arrow /> <span>Bill summary</span></div>
         <section className="bill-hero" aria-labelledby="bill-title">
@@ -295,7 +298,7 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
 
   return (
     <>
-      <Header property={property} onHome={() => window.location.reload()} screen="breakdown" />
+      <Header property={property} onHome={() => window.location.reload()} onBack={onBack} screen="breakdown" />
       <main className="breakdown-main page-width">
         <div className="breadcrumb"><button onClick={onBack} type="button">Bill summary</button><Arrow /> <span>Why this amount?</span></div>
         <section className="explain-intro"><div><span className="eyebrow"><span className="eyebrow-dot" />Your bill, unpacked</span><h1>Here’s how {rupees(amounts.due)} was calculated.</h1><p>Tap any line to see the rule behind it. If an input looks wrong, you can question that exact line.</p></div><div className="explain-total"><span>Amount due</span><strong>{rupees(amounts.due)}</strong><small>Due {property.dueDate}</small></div></section>
@@ -420,5 +423,5 @@ export default function Home() {
   function openDispute(line?: string) { setDisputeLine(line); setDisputeKey((n) => n + 1); setModal("dispute"); }
 
   if (!property) return <Lookup onChoose={selectProperty} />;
-  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => setScreen("breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} /> : <Breakdown property={property} onBack={() => setScreen("bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPaid(true); setLastPayment(result); setScreen("bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
+  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => setScreen("breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={() => window.location.reload()} /> : <Breakdown property={property} onBack={() => setScreen("bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPaid(true); setLastPayment(result); setScreen("bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
 }

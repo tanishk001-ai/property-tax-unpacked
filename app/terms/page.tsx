@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "./back-link";
 
 export const metadata: Metadata = {
   title: "Terms · Unpacked",
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main className="terms-page page-width">
-      <a className="terms-back" href="/">&larr; Unpacked</a>
+      <BackLink />
       <h1>Terms</h1>
       <p>
         This is an independent hackathon prototype, not a government product or service. All property records,
