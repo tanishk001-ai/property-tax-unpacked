@@ -1,0 +1,78 @@
+[
+  {
+    "id": "DEMO-2048",
+    "label": "A clear, paid-on-time bill",
+    "tone": "clear",
+    "address": "42, Banyan Court, Sector 8, Sampurna Nagar",
+    "zone": "Central residential zone",
+    "usage": "Residential",
+    "occupancy": "Self-occupied",
+    "ownerCategory": "Resident owner",
+    "builtUpArea": 84,
+    "uav": 120,
+    "usageFactor": 1,
+    "age": 18,
+    "ageFactor": 0.85,
+    "occupancyFactor": 1,
+    "taxRate": 0.12,
+    "appliedRebates": [
+      { "id": "self-occupied", "title": "Self-occupied home rebate", "percent": 10, "reason": "The property is recorded as your primary self-occupied home." },
+      { "id": "digital", "title": "Digital payment rebate", "percent": 5, "reason": "Your bill was issued with the online-payment rebate already included." }
+    ],
+    "unclaimedRebates": [],
+    "penalty": null,
+    "dueDate": "31 March 2026",
+    "status": "Due",
+    "billDate": "1 April 2025"
+  },
+  {
+    "id": "DEMO-7719",
+    "label": "A bill with a missed rebate",
+    "tone": "rebate",
+    "address": "18, Neem Residency, Lake Road, Sampurna Nagar",
+    "zone": "North residential zone",
+    "usage": "Residential",
+    "occupancy": "Self-occupied",
+    "ownerCategory": "Senior citizen co-owner",
+    "builtUpArea": 96,
+    "uav": 138,
+    "usageFactor": 1,
+    "age": 9,
+    "ageFactor": 0.95,
+    "occupancyFactor": 1,
+    "taxRate": 0.12,
+    "appliedRebates": [
+      { "id": "self-occupied", "title": "Self-occupied home rebate", "percent": 10, "reason": "The property is recorded as your primary self-occupied home." }
+    ],
+    "unclaimedRebates": [
+      { "id": "senior", "title": "Senior citizen co-owner rebate", "percent": 15, "reason": "A co-owner is marked as 60+. The declaration is not on file, so this has not been deducted." }
+    ],
+    "penalty": null,
+    "dueDate": "31 March 2026",
+    "status": "Due · possible saving found",
+    "billDate": "1 April 2025"
+  },
+  {
+    "id": "DEMO-3982",
+    "label": "An overdue bill with a penalty",
+    "tone": "penalty",
+    "address": "7, Gulmohar Enclave, Market Ward, Sampurna Nagar",
+    "zone": "Commercial corridor",
+    "usage": "Small retail shop",
+    "occupancy": "Owner-occupied",
+    "ownerCategory": "Resident owner",
+    "builtUpArea": 58,
+    "uav": 220,
+    "usageFactor": 1.35,
+    "age": 27,
+    "ageFactor": 0.75,
+    "occupancyFactor": 1,
+    "taxRate": 0.14,
+    "appliedRebates": [],
+    "unclaimedRebates": [],
+    "penalty": { "startDate": "1 April 2026", "rate": 1, "months": 5, "reason": "The 2025–26 bill remained unpaid after its 31 March 2026 due date." },
+    "dueDate": "31 March 2026",
+    "status": "Overdue",
+    "billDate": "1 April 2025"
+  }
+]
