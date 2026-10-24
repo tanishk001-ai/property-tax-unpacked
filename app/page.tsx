@@ -6,6 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import propertyFixtures from "./data/properties.json";
 import { useI18n, LangToggle, type Lang } from "./i18n";
 import { formatDateLocalised, translateData, type StrKey } from "./strings";
+import { makeReference } from "./reference";
 
 type TFn = (key: StrKey, ...args: (string | number)[]) => string;
 
@@ -430,7 +431,7 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
 
   function simulate() {
     setReceipt({
-      reference: `RCT-${property.id.slice(-4)}-260829`,
+      reference: makeReference("RCT", property.id),
       amount: amounts.due,
       mode,
       fy: property.fy,
@@ -490,17 +491,18 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
   const [lineId, setLineId] = useState<DisputeId>(initialLine ?? "annual-tax");
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [reference, setReference] = useState("");
   const [seenReset, setSeenReset] = useState(resetKey);
   if (resetKey !== seenReset) {
     setSeenReset(resetKey);
     setLineId(initialLine ?? "annual-tax");
     setSubmitted(false);
     setCopied(false);
+    setReference("");
   }
-  const reference = `DPT-${property.id.slice(-4)}-260829`;
   const lineLabel = disputeLabel(t, lang, property, lineId);
   const reason = t("disp.reason", lineLabel, property.id);
-  return <Modal onClose={onClose}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" key={`${lineId}-${lang}`} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
+  return <Modal onClose={onClose}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" key={`${lineId}-${lang}`} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
 }
 
 export default function Home() {
