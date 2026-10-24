@@ -3,7 +3,14 @@
     "id": "DEMO-2048",
     "label": "A clear, paid-on-time bill",
     "tone": "clear",
-    "address": { "houseNo": "42", "street": "Banyan Court", "locality": "Sector 8", "ward": "Ward 8", "city": "Sampurna Nagar", "pincode": "560 084" },
+    "address": {
+      "houseNo": "42",
+      "street": "Banyan Court",
+      "locality": "Sector 8",
+      "ward": "Ward 8",
+      "city": "Sampurna Nagar",
+      "pincode": "560 084"
+    },
     "khataNumber": "KH-0847/12",
     "surveyNumber": "142/3A",
     "ward": "Ward 8",
@@ -23,24 +30,57 @@
     "occupancyFactor": 1,
     "taxRate": 0.12,
     "appliedRebates": [
-      { "id": "self-occupied", "title": "Self-occupied home rebate", "percent": 10, "reason": "The property is recorded as your primary self-occupied home." },
-      { "id": "digital", "title": "Digital payment rebate", "percent": 5, "reason": "Your bill was issued with the online-payment rebate already included." }
+      {
+        "id": "self-occupied",
+        "title": "Self-occupied home rebate",
+        "percent": 10,
+        "reason": "The property is recorded as your primary self-occupied home."
+      },
+      {
+        "id": "digital",
+        "title": "Digital payment rebate",
+        "percent": 5,
+        "reason": "Your bill was issued with the online-payment rebate already included."
+      }
     ],
     "unclaimedRebates": [],
     "penalty": null,
-    "dueDate": "31 March 2026",
+    "dueDate": "31 March 2027",
     "status": "Due",
-    "billDate": "1 April 2025",
+    "fy": "2026–27",
+    "periodStart": "1 April 2026",
+    "periodEnd": "31 March 2027",
+    "billDate": "1 April 2026",
     "history": [
-      { "fy": "2024–25", "amount": 10120, "status": "Paid" },
-      { "fy": "2023–24", "amount": 9680, "status": "Paid" }
+      {
+        "fy": "2025–26",
+        "amount": 10310,
+        "status": "Paid"
+      },
+      {
+        "fy": "2024–25",
+        "amount": 10120,
+        "status": "Paid"
+      },
+      {
+        "fy": "2023–24",
+        "amount": 9680,
+        "status": "Paid"
+      }
     ]
   },
   {
     "id": "DEMO-7719",
     "label": "A bill with a missed rebate",
     "tone": "rebate",
-    "address": { "houseNo": "18", "street": "Lake Road", "locality": "Neem Residency", "ward": "Ward 14", "city": "Sampurna Nagar", "pincode": "560 071" },
+    "address": {
+      "houseNo": "18",
+      "street": "Lake Road",
+      "locality": "Neem Residency",
+      "ward": "Ward 14",
+      "city": "Sampurna Nagar",
+      "pincode": "560 071"
+    },
     "khataNumber": "KH-1526/03",
     "surveyNumber": "76/2B",
     "ward": "Ward 14",
@@ -60,25 +100,58 @@
     "occupancyFactor": 1,
     "taxRate": 0.12,
     "appliedRebates": [
-      { "id": "self-occupied", "title": "Self-occupied home rebate", "percent": 10, "reason": "The property is recorded as your primary self-occupied home." }
+      {
+        "id": "self-occupied",
+        "title": "Self-occupied home rebate",
+        "percent": 10,
+        "reason": "The property is recorded as your primary self-occupied home."
+      }
     ],
     "unclaimedRebates": [
-      { "id": "senior", "title": "Senior citizen co-owner rebate", "percent": 15, "reason": "A co-owner is marked as 60+. The declaration is not on file, so this has not been deducted." }
+      {
+        "id": "senior",
+        "title": "Senior citizen co-owner rebate",
+        "percent": 15,
+        "reason": "A co-owner is marked as 60+. The declaration is not on file, so this has not been deducted."
+      }
     ],
     "penalty": null,
-    "dueDate": "31 March 2026",
+    "dueDate": "31 March 2027",
     "status": "Due · possible saving found",
-    "billDate": "1 April 2025",
+    "fy": "2026–27",
+    "periodStart": "1 April 2026",
+    "periodEnd": "31 March 2027",
+    "billDate": "1 April 2026",
     "history": [
-      { "fy": "2024–25", "amount": 15760, "status": "Paid" },
-      { "fy": "2023–24", "amount": 15200, "status": "Paid" }
+      {
+        "fy": "2025–26",
+        "amount": 16020,
+        "status": "Paid"
+      },
+      {
+        "fy": "2024–25",
+        "amount": 15760,
+        "status": "Paid"
+      },
+      {
+        "fy": "2023–24",
+        "amount": 15200,
+        "status": "Paid"
+      }
     ]
   },
   {
     "id": "DEMO-3982",
     "label": "An overdue bill with a penalty",
     "tone": "penalty",
-    "address": { "houseNo": "7", "street": "Gulmohar Enclave", "locality": "Market Ward", "ward": "Ward 6", "city": "Sampurna Nagar", "pincode": "560 002" },
+    "address": {
+      "houseNo": "7",
+      "street": "Gulmohar Enclave",
+      "locality": "Market Ward",
+      "ward": "Ward 6",
+      "city": "Sampurna Nagar",
+      "pincode": "560 002"
+    },
     "khataNumber": "KH-2093/11",
     "surveyNumber": "512/1",
     "ward": "Ward 6",
@@ -99,13 +172,33 @@
     "taxRate": 0.14,
     "appliedRebates": [],
     "unclaimedRebates": [],
-    "penalty": { "startDate": "1 April 2026", "rate": 1, "months": 5, "reason": "The 2025–26 bill remained unpaid after its 31 March 2026 due date." },
-    "dueDate": "31 March 2026",
+    "penalty": {
+      "startDate": "1 June 2026",
+      "rate": 1,
+      "months": 5
+    },
+    "dueDate": "31 May 2026",
     "status": "Overdue",
-    "billDate": "1 April 2025",
+    "fy": "2026–27",
+    "periodStart": "1 April 2026",
+    "periodEnd": "31 March 2027",
+    "billDate": "1 April 2026",
     "history": [
-      { "fy": "2024–25", "amount": 21050, "status": "Paid" },
-      { "fy": "2023–24", "amount": 20240, "status": "Paid" }
+      {
+        "fy": "2025–26",
+        "amount": 21480,
+        "status": "Paid"
+      },
+      {
+        "fy": "2024–25",
+        "amount": 21050,
+        "status": "Paid"
+      },
+      {
+        "fy": "2023–24",
+        "amount": 20240,
+        "status": "Paid"
+      }
     ]
   }
 ]

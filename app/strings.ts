@@ -123,9 +123,9 @@ export const STR = {
     en: "A co-owner is marked as 60+. The declaration is not on file, so this has not been deducted.",
     hi: "एक सह-स्वामी 60+ के रूप में चिह्नित है। घोषणा फ़ाइल में नहीं है, इसलिए यह घटाई नहीं गई है।",
   },
-  "The 2025–26 bill remained unpaid after its 31 March 2026 due date.": {
-    en: "The 2025–26 bill remained unpaid after its 31 March 2026 due date.",
-    hi: "2025–26 का बिल अपनी 31 मार्च 2026 की नियत तिथि के बाद अदत्त रहा।",
+  "pen.reason": {
+    en: (fy, due) => `The ${fy} bill remained unpaid after its ${due} due date.`,
+    hi: (fy, due) => `${fy} का बिल अपनी ${due} की नियत तिथि के बाद अदत्त रहा।`,
   },
 
   // ---- bill summary ----
@@ -134,7 +134,7 @@ export const STR = {
     en: "Payment simulated · rebate still unclaimed",
     hi: "भुगतान सिम्युलेटेड · छूट अब भी अदावाकृत",
   },
-  "bill.title": { en: "Your 2025–26 property tax bill", hi: "आपका 2025–26 संपत्ति कर बिल" },
+  "bill.title": { en: (fy) => `Your ${fy} property tax bill`, hi: (fy) => `आपका ${fy} संपत्ति कर बिल` },
   "bill.amountDue": { en: "Amount due", hi: "देय राशि" },
   "bill.paidSimulated": { en: "Paid (simulated)", hi: "भुगतान (सिम्युलेटेड)" },
   "bill.noRealPayment": { en: "No real payment was processed.", hi: "कोई वास्तविक भुगतान नहीं हुआ।" },
@@ -160,7 +160,7 @@ export const STR = {
   "bill.warn.understand": { en: "Understand it", hi: "समझें" },
   "bill.details": { en: "Bill details", hi: "बिल विवरण" },
   "bill.period": { en: "Bill period", hi: "बिल अवधि" },
-  "bill.periodValue": { en: "1 Apr 2025 – 31 Mar 2026", hi: "1 अप्रैल 2025 – 31 मार्च 2026" },
+  "bill.periodValue": { en: (start, end) => `${start} – ${end}`, hi: (start, end) => `${start} – ${end}` },
   "bill.issuedOn": { en: "Issued on", hi: "जारी तिथि" },
   "bill.dueDate": { en: "Due date", hi: "नियत तिथि" },
   "bill.propertyUse": { en: "Property use", hi: "संपत्ति का उपयोग" },

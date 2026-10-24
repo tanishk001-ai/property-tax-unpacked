@@ -47,7 +47,7 @@ function disputeLabel(t: TFn, lang: Lang, property: Property, id: DisputeId): st
 }
 
 type Rebate = { id: string; title: string; percent: number; reason: string };
-type Penalty = { startDate: string; rate: number; months: number; reason: string } | null;
+type Penalty = { startDate: string; rate: number; months: number } | null;
 type HistoryEntry = { fy: string; amount: number; status: string };
 type PayMode = "UPI" | "Card" | "Net Banking";
 type PaymentResult = { reference: string; amount: number; mode: PayMode; timestamp: string; fy: string };
@@ -81,6 +81,9 @@ type Property = {
   penalty: Penalty;
   dueDate: string;
   status: string;
+  fy: string;
+  periodStart: string;
+  periodEnd: string;
   billDate: string;
   history: HistoryEntry[];
 };
@@ -268,7 +271,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, last
   const isOverdue = property.penalty !== null;
   const currentStatusKey = paid ? "Paid (simulated)" : isOverdue ? "Overdue" : "Due";
   const historyRows = [
-    { fy: "2025–26", amount: paid ? (lastPayment?.amount ?? amounts.due) : amounts.due, statusKey: currentStatusKey, current: true },
+    { fy: property.fy, amount: paid ? (lastPayment?.amount ?? amounts.due) : amounts.due, statusKey: currentStatusKey, current: true },
     ...property.history.map((entry) => ({ fy: entry.fy, amount: entry.amount, statusKey: entry.status, current: false })),
   ];
 
@@ -284,7 +287,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, last
               {paid ? (hasSaving ? t("bill.status.paidRebate") : t("bill.status.paid")) : translateData(lang, property.status)}
             </div>
             <p className="address">{formatAddress(lang, property.address)}</p>
-            <h1 id="bill-title">{t("bill.title")}</h1>
+            <h1 id="bill-title">{t("bill.title", property.fy)}</h1>
           </div>
           <div className="amount-panel">
             <span>{paid ? t("bill.paidSimulated") : t("bill.amountDue")}</span>
@@ -297,7 +300,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, last
         {isOverdue && !paid && <section className="insight-banner warning-banner"><Icon name="warning" /><div><strong>{t("bill.warn.title")}</strong><span>{t("bill.warn.body", rupees(amounts.penaltyAmount))}</span></div><button className="text-button" type="button" onClick={onExplain}>{t("bill.warn.understand")} <Arrow /></button></section>}
 
         <section className="summary-grid" aria-label="Bill summary details">
-          <div className="summary-card summary-info"><span className="summary-card-label">{t("bill.details")}</span><dl><Stat label={t("bill.period")}>{t("bill.periodValue")}</Stat><Stat label={t("bill.issuedOn")}>{formatDateLocalised(lang, property.billDate)}</Stat><Stat label={t("bill.dueDate")}>{formatDateLocalised(lang, property.dueDate)}</Stat><Stat label={t("bill.propertyUse")}>{translateData(lang, property.usage)}</Stat></dl></div>
+          <div className="summary-card summary-info"><span className="summary-card-label">{t("bill.details")}</span><dl><Stat label={t("bill.period")}>{t("bill.periodValue", formatDateLocalised(lang, property.periodStart), formatDateLocalised(lang, property.periodEnd))}</Stat><Stat label={t("bill.issuedOn")}>{formatDateLocalised(lang, property.billDate)}</Stat><Stat label={t("bill.dueDate")}>{formatDateLocalised(lang, property.dueDate)}</Stat><Stat label={t("bill.propertyUse")}>{translateData(lang, property.usage)}</Stat></dl></div>
           <div className="summary-card summary-action"><span className="summary-card-label">{t("bill.beforeYouPay")}</span><h2>{t("bill.understandEveryRupee")}</h2><p>{t("bill.understandBody")}</p><button className="button button-dark button-large" type="button" onClick={onExplain}>{t("bill.whyThisAmount")} <Arrow /></button></div>
         </section>
 
@@ -368,7 +371,7 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
     { id: "swm-cess", disputeId: "swm-cess", label: t("line.swmCess"), amount: cess.swm, helper: t("help.cessSwm"), detail: <p>{t("det.swmCess", rupees(cess.swm), rupees(amounts.coreTax))}</p> },
   ];
   const summaryLines: Line[] = [
-    ...(property.penalty ? [{ id: "penalty", disputeId: "late-charge" as const, label: t("line.latePaymentCharge"), amount: amounts.penaltyAmount, sign: "plus" as const, helper: t("help.penalty", property.penalty.rate, property.penalty.months), attention: "warning" as const, detail: <p>{t("det.penalty", translateData(lang, property.penalty.reason), formatDateLocalised(lang, property.penalty.startDate), property.penalty.rate, rupees(amounts.beforePenalty), property.penalty.months, rupees(amounts.penaltyAmount))}</p> }] : []),
+    ...(property.penalty ? [{ id: "penalty", disputeId: "late-charge" as const, label: t("line.latePaymentCharge"), amount: amounts.penaltyAmount, sign: "plus" as const, helper: t("help.penalty", property.penalty.rate, property.penalty.months), attention: "warning" as const, detail: <p>{t("det.penalty", t("pen.reason", property.fy, formatDateLocalised(lang, property.dueDate)), formatDateLocalised(lang, property.penalty.startDate), property.penalty.rate, rupees(amounts.beforePenalty), property.penalty.months, rupees(amounts.penaltyAmount))}</p> }] : []),
     { id: "total", disputeId: "amount-due", label: t("line.amountDue"), amount: amounts.due, sign: "equals" as const, helper: t("help.totalDue"), detail: <p>{t("det.total")}</p> },
   ];
   const toggle = (id: string) => setOpenLine((current) => current === id ? null : id);
@@ -430,7 +433,7 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
       reference: `RCT-${property.id.slice(-4)}-260829`,
       amount: amounts.due,
       mode,
-      fy: "2025–26",
+      fy: property.fy,
       timestamp: new Date().toLocaleString(lang === "hi" ? "hi-IN" : "en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }) + " IST",
     });
   }
