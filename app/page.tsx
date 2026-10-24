@@ -4,8 +4,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FormEvent, ReactNode, useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import propertyFixtures from "./data/properties.json";
-import { useI18n, LangToggle, type Lang } from "./i18n";
-import { formatDateLocalised, translateData, type StrKey } from "./strings";
+import { useI18n, useDocumentTitle, LangToggle, type Lang } from "./i18n";
+import { formatDateLocalised, translate, translateData, type StrKey } from "./strings";
 import { makeReference } from "./reference";
 
 type TFn = (key: StrKey, ...args: (string | number)[]) => string;
@@ -45,7 +45,7 @@ type Rebate = { id: string; title: string; percent: number; reason: string };
 type Penalty = { startDate: string; rate: number; months: number } | null;
 type HistoryEntry = { fy: string; amount: number; status: string };
 type PayMode = "UPI" | "Card" | "Net Banking";
-type PaymentResult = { reference: string; amount: number; mode: PayMode; timestamp: string; fy: string };
+type PaymentResult = { reference: string; amount: number; mode: PayMode; paidAt: number; fy: string };
 type Address = { houseNo: string; street: string; locality: string; ward: string; city: string; pincode: string };
 type Relation = "S/O" | "D/O" | "W/O";
 type Property = {
@@ -106,7 +106,22 @@ function rupees(value: number) {
   return money.format(Math.round(value));
 }
 
-const RELATION_HI: Record<Relation, string> = { "S/O": "पुत्र", "D/O": "पुत्री", "W/O": "पत्नी" };
+// Receipt time, always shown in Indian Standard Time (the label says so), formatted
+// when rendered so it follows the language toggle.
+function formatTimestamp(lang: Lang, ms: number, tzLabel: string) {
+  const locale = lang === "hi" ? "hi-IN" : "en-IN";
+  const at = new Date(ms);
+  const date = at.toLocaleDateString(locale, { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+  const time = at.toLocaleTimeString(locale, { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit", ...(lang === "en" ? { hour12: true } : { hourCycle: "h23" as const }) });
+  return `${date}, ${time} ${tzLabel}`;
+}
+
+function RecordLabel({ k }: { k: StrKey }) {
+  const { t, lang } = useI18n();
+  // English view keeps the Devanagari sub-label (how a bilingual khata extract prints);
+  // the Hindi view is Hindi-only.
+  return <>{t(k)}{lang === "en" && <span className="record-hi" lang="hi">{translate("hi", k)}</span>}</>;
+}
 
 function formatAddress(lang: Lang, a: Address) {
   const d = (v: string) => translateData(lang, v);
@@ -157,7 +172,7 @@ function Icon({ name, className = "" }: { name: "check" | "spark" | "warning" | 
 function PrototypeNote({ compact = false }: { compact?: boolean }) {
   const { t } = useI18n();
   return (
-    <aside className={`prototype-note ${compact ? "prototype-note-compact" : ""}`} aria-label="Prototype disclosure">
+    <aside className={`prototype-note ${compact ? "prototype-note-compact" : ""}`} aria-label={t("aria.prototype")}>
       <Icon name="shield" />
       <p><strong>{t("note.lead")}</strong> <a className="prototype-note-link" href="/terms">{t("note.fullTerms")}</a> · <a className="prototype-note-link" href="/faq">{t("note.faq")}</a>. {t("note.body")}</p>
     </aside>
@@ -283,7 +298,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, last
         {hasSaving && <section className="insight-banner saving-banner"><Icon name="info" /><div><strong>{paid ? t("bill.saving.titlePaid") : t("bill.saving.titleUnpaid")}</strong><span>{paid ? t("bill.saving.bodyPaid", rupees(savingTotal)) : t("bill.saving.bodyUnpaid", rupees(savingTotal))}</span></div><button className="text-button" type="button" onClick={onExplain}>{t("bill.saving.seeIt")} <Arrow /></button></section>}
         {isOverdue && !paid && <section className="insight-banner warning-banner"><Icon name="warning" /><div><strong>{t("bill.warn.title")}</strong><span>{t("bill.warn.body", rupees(amounts.penaltyAmount))}</span></div><button className="text-button" type="button" onClick={onExplain}>{t("bill.warn.understand")} <Arrow /></button></section>}
 
-        <section className="summary-grid" aria-label="Bill summary details">
+        <section className="summary-grid" aria-label={t("aria.billDetails")}>
           <div className="summary-card summary-info"><span className="summary-card-label">{t("bill.details")}</span><dl><Stat label={t("bill.period")}>{t("bill.periodValue", formatDateLocalised(lang, property.periodStart), formatDateLocalised(lang, property.periodEnd))}</Stat><Stat label={t("bill.issuedOn")}>{formatDateLocalised(lang, property.billDate)}</Stat><Stat label={t("bill.dueDate")}>{formatDateLocalised(lang, property.dueDate)}</Stat><Stat label={t("bill.propertyUse")}>{translateData(lang, property.usage)}</Stat></dl></div>
           <div className="summary-card summary-action"><span className="summary-card-label">{t("bill.beforeYouPay")}</span><h2>{t("bill.understandEveryRupee")}</h2><p>{t("bill.understandBody")}</p><button className="button button-dark button-large" type="button" onClick={onExplain}>{t("bill.whyThisAmount")} <Arrow /></button></div>
         </section>
@@ -343,6 +358,10 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
   const occT = translateData(lang, property.occupancy);
   const areaV = rupees(amounts.areaValue);
   const occV = rupees(amounts.occupancyValue);
+  const relKey = `rel.${property.relation}` as const;
+  const relationLine = lang === "en"
+    ? `${translate("hi", relKey)} ${translate("en", relKey)} ${property.relationName}`
+    : `${translate("hi", relKey)} ${translateData(lang, property.relationName)}`;
   const formulaLines: Line[] = [
     { id: "area", disputeId: "built-up-area", label: t("line.builtUpArea"), amount: amounts.areaValue, helper: t("help.area", property.builtUpArea, rupees(property.uav)), detail: <p>{t("det.area", property.builtUpArea, rupees(property.uav), areaV)}</p> },
     { id: "usage", disputeId: "use-factor", label: t("line.useFactor", usageT), amount: amounts.usageValue, helper: t("help.useFactor", property.usageFactor.toFixed(2)), detail: <p>{t("det.useFactor", usageT, property.usageFactor.toFixed(2), rupees(amounts.usageValue))}</p> },
@@ -366,13 +385,13 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
         <section className="record-section" aria-labelledby="record-title">
           <div className="section-heading"><span>01</span><div><h2 id="record-title">{t("rec.title")}</h2><p>{t("rec.sub")}</p></div></div>
           <dl className="record-list">
-            <div className="record-row"><dt>Khata number</dt><dd>{property.khataNumber}</dd></div>
-            <div className="record-row"><dt>Survey number</dt><dd>{property.surveyNumber}</dd></div>
-            <div className="record-row"><dt>Ward <span className="record-hi" lang="hi">वार्ड</span></dt><dd>{property.ward}</dd></div>
-            <div className="record-row"><dt>Owner name <span className="record-hi" lang="hi">स्वामी का नाम</span></dt><dd>{property.ownerName}<em>{RELATION_HI[property.relation]} {property.relation} {property.relationName}</em></dd></div>
-            <div className="record-row"><dt>Government guideline rate <span className="record-hi" lang="hi">गाइडलाइन दर</span></dt><dd>{rupees(property.guidelineRate)}/m²<em>A separate valuation reference published by the state — it does not affect this bill&apos;s calculation.</em></dd></div>
+            <div className="record-row"><dt><RecordLabel k="rec.khata" /></dt><dd>{property.khataNumber}</dd></div>
+            <div className="record-row"><dt><RecordLabel k="rec.survey" /></dt><dd>{property.surveyNumber}</dd></div>
+            <div className="record-row"><dt><RecordLabel k="rec.ward" /></dt><dd>{translateData(lang, property.ward)}</dd></div>
+            <div className="record-row"><dt><RecordLabel k="rec.owner" /></dt><dd>{translateData(lang, property.ownerName)}<em>{relationLine}</em></dd></div>
+            <div className="record-row"><dt><RecordLabel k="rec.guideline" /></dt><dd>{t("rec.guidelineValue", rupees(property.guidelineRate))}<em>{t("rec.guidelineNote")}</em></dd></div>
           </dl>
-          <dl className="facts-grid"><Stat label={t("rec.builtUpArea")}>{property.builtUpArea} m²</Stat><Stat label={t("rec.zone")}>{translateData(lang, property.zone)}</Stat><Stat label={t("rec.usage")}>{usageT}</Stat><Stat label={t("rec.buildingAge")}>{t("rec.years", property.age)}</Stat><Stat label={t("rec.occupancy")}>{occT}</Stat><Stat label={t("rec.ownerCategory")}>{translateData(lang, property.ownerCategory)}</Stat></dl>
+          <dl className="facts-grid"><Stat label={t("rec.builtUpArea")}>{t("unit.sqm", property.builtUpArea)}</Stat><Stat label={t("rec.zone")}>{translateData(lang, property.zone)}</Stat><Stat label={t("rec.usage")}>{usageT}</Stat><Stat label={t("rec.buildingAge")}>{t("rec.years", property.age)}</Stat><Stat label={t("rec.occupancy")}>{occT}</Stat><Stat label={t("rec.ownerCategory")}>{translateData(lang, property.ownerCategory)}</Stat></dl>
         </section>
 
         <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">{t("calc.title")}</h2><p>{t("calc.method")}</p></div></div><div className="formula-card"><div className="formula-caption">{t("calc.formulaCaption")}</div><div className="formula-text"><span>{t("calc.f.area")}</span><i>×</i><span>{t("calc.f.uav")}</span><i>×</i><span>{t("calc.f.use")}</span><i>×</i><span>{t("calc.f.age")}</span><i>×</i><span>{t("calc.f.occupancy")}</span></div><p>{t("calc.thenRate")}</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => line.disputeId && onDispute(line.disputeId)} />)}</div></section>
@@ -414,7 +433,7 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
       amount: amounts.due,
       mode,
       fy: property.fy,
-      timestamp: new Date().toLocaleString(lang === "hi" ? "hi-IN" : "en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }) + " IST",
+      paidAt: Date.now(),
     });
   }
 
@@ -428,14 +447,14 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
           <h2>{t("rcpt.title", payModeLabel(t, receipt.mode))}</h2>
           <p>{t("rcpt.body")}</p>
           <div className="receipt-card">
-            <div className="receipt-qr"><QRCodeSVG value={receipt.reference} size={116} level="M" bgColor="#f7f8f5" fgColor="#17231e" title={`Receipt ${receipt.reference}`} /><small>{t("rcpt.qrNote")}</small></div>
+            <div className="receipt-qr"><QRCodeSVG value={receipt.reference} size={116} level="M" bgColor="#f7f8f5" fgColor="#17231e" title={t("rcpt.qrTitle", receipt.reference)} /><small>{t("rcpt.qrNote")}</small></div>
             <dl className="receipt-rows">
               <div><dt>{t("rcpt.number")}</dt><dd>{receipt.reference}</dd></div>
               <div><dt>{t("rcpt.fy")}</dt><dd>{receipt.fy}</dd></div>
               <div><dt>{t("rcpt.propertyId")}</dt><dd>{property.id}</dd></div>
               <div><dt>{t("rcpt.amountPaid")}</dt><dd>{rupees(receipt.amount)}</dd></div>
               <div><dt>{t("rcpt.mode")}</dt><dd>{payModeLabel(t, receipt.mode)}</dd></div>
-              <div><dt>{t("rcpt.timestamp")}</dt><dd>{receipt.timestamp}</dd></div>
+              <div><dt>{t("rcpt.timestamp")}</dt><dd>{formatTimestamp(lang, receipt.paidAt, t("rcpt.tz"))}</dd></div>
             </dl>
           </div>
           <p className="receipt-disclaimer"><Icon name="shield" /> {t("rcpt.disclaimer")}</p>
@@ -485,6 +504,7 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
 }
 
 export default function Home() {
+  useDocumentTitle("meta.title.home");
   const [property, setProperty] = useState<Property | null>(null);
   const [screen, setScreen] = useState<"bill" | "breakdown">("bill");
   const [modal, setModal] = useState<"payment" | "dispute" | null>(null);

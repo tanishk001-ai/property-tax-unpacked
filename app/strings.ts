@@ -30,6 +30,15 @@ export function formatDateLocalised(lang: Lang, s: string): string {
   );
 }
 
+// Look up a dictionary entry for a given language (used by the i18n context's
+// t() and, directly, where a view needs both languages at once).
+export function translate(lang: Lang, key: StrKey, ...args: (string | number)[]): string {
+  const entry = STR[key];
+  const value = entry ? entry[lang] : undefined;
+  if (value == null) return key;
+  return typeof value === "function" ? (value as Fn)(...args) : value;
+}
+
 // Translate a fixed data value (from properties.json) by looking it up by its
 // English text. Unknown values pass through unchanged.
 export function translateData(lang: Lang, value: string): string {
@@ -52,7 +61,12 @@ export const STR = {
   "pill.property": { en: "Property", hi: "संपत्ति" },
   "pill.bill": { en: "Bill", hi: "बिल" },
   "pill.explanation": { en: "Explanation", hi: "विवरण" },
-  "lang.group": { en: "Language / भाषा", hi: "भाषा / Language" },
+  "lang.group": { en: "Language", hi: "भाषा" },
+  "meta.title.home": { en: "Unpacked · Property bill explainer", hi: "Unpacked · संपत्ति बिल की व्याख्या" },
+  "meta.title.terms": { en: "Terms · Unpacked", hi: "शर्तें · Unpacked" },
+  "meta.title.faq": { en: "Common questions · Unpacked", hi: "सामान्य प्रश्न · Unpacked" },
+  "aria.prototype": { en: "Prototype disclosure", hi: "प्रोटोटाइप संबंधी सूचना" },
+  "aria.billDetails": { en: "Bill summary details", hi: "बिल सारांश विवरण" },
 
   // ---- landing / lookup ----
   "landing.eyebrow": { en: "For Sampurna Nagar · demo", hi: "संपूर्णा नगर के लिए · डेमो" },
@@ -91,6 +105,16 @@ export const STR = {
   "Neem Residency": { en: "Neem Residency", hi: "नीम रेज़िडेंसी" },
   "Market Ward": { en: "Market Ward", hi: "मार्केट वार्ड" },
   "Sampurna Nagar": { en: "Sampurna Nagar", hi: "संपूर्णा नगर" },
+  "Ward 8": { en: "Ward 8", hi: "वार्ड 8" },
+  "Ward 14": { en: "Ward 14", hi: "वार्ड 14" },
+  "Ward 6": { en: "Ward 6", hi: "वार्ड 6" },
+  // Seeded owner names — transliterated for the Hindi view.
+  "Suresh Kumar Nair": { en: "Suresh Kumar Nair", hi: "सुरेश कुमार नायर" },
+  "Gopalan Nair": { en: "Gopalan Nair", hi: "गोपालन नायर" },
+  "Anjali Verma": { en: "Anjali Verma", hi: "अंजलि वर्मा" },
+  "Ramesh Chandra Verma": { en: "Ramesh Chandra Verma", hi: "रमेश चंद्र वर्मा" },
+  "Fatima Sheikh": { en: "Fatima Sheikh", hi: "फ़ातिमा शेख़" },
+  "Imran Sheikh": { en: "Imran Sheikh", hi: "इमरान शेख़" },
   "Central residential zone": { en: "Central residential zone", hi: "मध्य आवासीय क्षेत्र" },
   "North residential zone": { en: "North residential zone", hi: "उत्तर आवासीय क्षेत्र" },
   "Commercial corridor": { en: "Commercial corridor", hi: "वाणिज्यिक गलियारा" },
@@ -130,14 +154,13 @@ export const STR = {
   "bill.status.paid": { en: "Payment simulated", hi: "भुगतान सिम्युलेटेड" },
   "bill.status.paidRebate": {
     en: "Payment simulated · rebate still unclaimed",
-    hi: "भुगतान सिम्युलेटेड · छूट अब भी अदावाकृत",
+    hi: "भुगतान सिम्युलेटेड · छूट का दावा अब भी बाकी",
   },
   "bill.title": { en: (fy) => `Your ${fy} property tax bill`, hi: (fy) => `आपका ${fy} संपत्ति कर बिल` },
   "bill.amountDue": { en: "Amount due", hi: "देय राशि" },
   "bill.paidSimulated": { en: "Paid (simulated)", hi: "भुगतान (सिम्युलेटेड)" },
   "bill.noRealPayment": { en: "No real payment was processed.", hi: "कोई वास्तविक भुगतान नहीं हुआ।" },
   "bill.simulatedVia": { en: (m) => `Simulated via ${m} · `, hi: (m) => `${m} के ज़रिए सिम्युलेटेड · ` },
-  "bill.dueBy": { en: (d) => `Due by `, hi: (d) => `` }, // date rendered separately; prefix only
   "bill.dueByFull": { en: (d) => `Due by ${d}`, hi: (d) => `${d} तक देय` },
   "bill.saving.titleUnpaid": {
     en: "You may be paying more than you need to.",
@@ -200,6 +223,21 @@ export const STR = {
     en: "The municipal record for this property, and the facts the calculation starts with.",
     hi: "इस संपत्ति का नगरपालिका रिकॉर्ड, और वे तथ्य जिनसे गणना शुरू होती है।",
   },
+  "rec.khata": { en: "Khata number", hi: "खाता संख्या" },
+  // TODO(i18n): "Survey number" has regional variants (सर्वे नंबर / सर्वे संख्या / भूमि सर्वेक्षण संख्या).
+  "rec.survey": { en: "Survey number", hi: "सर्वे संख्या" },
+  "rec.ward": { en: "Ward", hi: "वार्ड" },
+  "rec.owner": { en: "Owner name", hi: "स्वामी का नाम" },
+  "rec.guideline": { en: "Government guideline rate", hi: "सरकारी गाइडलाइन दर" },
+  "rec.guidelineValue": { en: (rate) => `${rate}/m²`, hi: (rate) => `${rate}/वर्ग मीटर` },
+  "rec.guidelineNote": {
+    en: "A separate valuation reference published by the state — it does not affect this bill’s calculation.",
+    hi: "राज्य द्वारा प्रकाशित एक अलग मूल्यांकन संदर्भ — यह इस बिल की गणना को प्रभावित नहीं करता।",
+  },
+  "rel.S/O": { en: "S/O", hi: "पुत्र" },
+  "rel.D/O": { en: "D/O", hi: "पुत्री" },
+  "rel.W/O": { en: "W/O", hi: "पत्नी" },
+  "unit.sqm": { en: (n) => `${n} m²`, hi: (n) => `${n} वर्ग मीटर` },
   "rec.builtUpArea": { en: "Built-up area", hi: "निर्मित क्षेत्र" },
   "rec.zone": { en: "Zone", hi: "क्षेत्र" },
   "rec.usage": { en: "Usage", hi: "उपयोग" },
@@ -233,7 +271,7 @@ export const STR = {
   "line.amountDue": { en: "Amount due", hi: "देय राशि" },
 
   // ---- calculation line helpers ----
-  "help.area": { en: (a, u) => `${a} m² × ${u}/m²/month × 12 months`, hi: (a, u) => `${a} m² × ${u}/m²/माह × 12 माह` },
+  "help.area": { en: (a, u) => `${a} m² × ${u}/m²/month × 12 months`, hi: (a, u) => `${a} वर्ग मीटर × ${u}/वर्ग मीटर/माह × 12 माह` },
   "help.useFactor": { en: (f) => `Assessed value × ${f}`, hi: (f) => `निर्धारित मूल्य × ${f}` },
   "help.ageFactor": { en: (f) => `Adjusted value × ${f}`, hi: (f) => `समायोजित मूल्य × ${f}` },
   "help.occupancyFactor": { en: (f) => `Adjusted value × ${f}`, hi: (f) => `समायोजित मूल्य × ${f}` },
@@ -341,6 +379,8 @@ export const STR = {
   "rcpt.amountPaid": { en: "Amount paid", hi: "भुगतान की गई राशि" },
   "rcpt.mode": { en: "Payment mode", hi: "भुगतान का तरीका" },
   "rcpt.timestamp": { en: "Timestamp", hi: "समय-चिह्न" },
+  "rcpt.tz": { en: "IST", hi: "भारतीय समय" },
+  "rcpt.qrTitle": { en: (ref) => `Receipt ${ref}`, hi: (ref) => `रसीद ${ref}` },
   "rcpt.disclaimer": {
     en: "Mock receipt — for prototype demonstration only, not valid proof of payment.",
     hi: "मॉक रसीद — केवल प्रोटोटाइप प्रदर्शन के लिए, भुगतान का वैध प्रमाण नहीं।",

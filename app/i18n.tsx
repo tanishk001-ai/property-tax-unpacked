@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { STR, type StrKey } from "./strings";
+import { translate, type StrKey } from "./strings";
 
 export type Lang = "en" | "hi";
 
@@ -34,15 +34,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = useCallback(
-    (key: StrKey, ...args: (string | number)[]) => {
-      const entry = STR[key];
-      const value = entry ? entry[lang] : undefined;
-      if (value == null) return key;
-      return typeof value === "function" ? (value as (...a: (string | number)[]) => string)(...args) : value;
-    },
-    [lang],
-  );
+  // Keep <html lang> in step with the toggle (screen readers, hyphenation, fonts).
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const t = useCallback((key: StrKey, ...args: (string | number)[]) => translate(lang, key, ...args), [lang]);
 
   const ctx = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
   return <I18nContext.Provider value={ctx}>{children}</I18nContext.Provider>;
@@ -52,10 +49,18 @@ export function useI18n() {
   return useContext(I18nContext);
 }
 
+// Sets the browser tab title in the active language.
+export function useDocumentTitle(key: StrKey) {
+  const { t } = useI18n();
+  useEffect(() => {
+    document.title = t(key);
+  }, [t, key]);
+}
+
 export function LangToggle({ compact = false }: { compact?: boolean }) {
-  const { lang, setLang } = useI18n();
+  const { lang, setLang, t } = useI18n();
   return (
-    <div className={`lang-toggle ${compact ? "lang-toggle-compact" : ""}`} role="group" aria-label="Language / भाषा">
+    <div className={`lang-toggle ${compact ? "lang-toggle-compact" : ""}`} role="group" aria-label={t("lang.group")}>
       <button type="button" className={lang === "en" ? "is-active" : ""} aria-pressed={lang === "en"} onClick={() => setLang("en")}>
         EN
       </button>
