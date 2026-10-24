@@ -9,8 +9,6 @@
 //   late-payment charge → विलंब शुल्क | dispute → आपत्ति | bill/receipt → बिल/रसीद
 //   payment → भुगतान | ward → वार्ड | guideline rate → गाइडलाइन दर
 //   S/O·D/O·W/O → पुत्र·पुत्री·पत्नी | owner name → स्वामी का नाम
-//   SWM cess → ठोस अपशिष्ट प्रबंधन उपकर | library cess → पुस्तकालय उपकर
-//   health cess → स्वास्थ्य उपकर
 
 import type { Lang } from "./i18n";
 
@@ -223,22 +221,12 @@ export const STR = {
   "calc.f.age": { en: "age", hi: "आयु" },
   "calc.f.occupancy": { en: "occupancy", hi: "अधिभोग" },
   "calc.thenRate": { en: "Then the annual tax rate is applied. Here is each step.", hi: "फिर वार्षिक कर दर लागू होती है। यहाँ हर चरण है।" },
-  "calc.cessNote": {
-    en: (rate, tax) =>
-      `Base property tax, library cess, health cess and SWM cess are a split of the single ${rate}% municipal rate — a real bill shows only the combined figure. Together they equal your annual property tax of ${tax}, before any rebate or late-payment charge.`,
-    hi: (rate, tax) =>
-      `मूल संपत्ति कर, पुस्तकालय उपकर, स्वास्थ्य उपकर और SWM उपकर एक ही ${rate}% नगरपालिका दर का विभाजन हैं — असली बिल केवल संयुक्त आँकड़ा दिखाता है। मिलकर ये किसी छूट या विलंब शुल्क से पहले आपके ${tax} वार्षिक संपत्ति कर के बराबर हैं।`,
-  },
 
   // ---- calculation line labels ----
   "line.builtUpArea": { en: "Built-up area", hi: "निर्मित क्षेत्र" },
   "line.useFactor": { en: (u) => `${u} use factor`, hi: (u) => `${u} उपयोग गुणक` },
   "line.ageFactor": { en: (n) => `${n}-year building age factor`, hi: (n) => `${n}-वर्ष भवन आयु गुणक` },
   "line.occupancyFactor": { en: (o) => `${o} factor`, hi: (o) => `${o} गुणक` },
-  "line.baseTax": { en: "Base property tax", hi: "मूल संपत्ति कर" },
-  "line.libraryCess": { en: "Library cess", hi: "पुस्तकालय उपकर" },
-  "line.healthCess": { en: "Health cess", hi: "स्वास्थ्य उपकर" },
-  "line.swmCess": { en: "Solid Waste Management (SWM) cess", hi: "ठोस अपशिष्ट प्रबंधन (SWM) उपकर" },
   "line.annualPropertyTax": { en: "Annual property tax", hi: "वार्षिक संपत्ति कर" },
   "line.appliedRebate": { en: "Applied rebate", hi: "लागू छूट" },
   "line.latePaymentCharge": { en: "Late-payment charge", hi: "विलंब शुल्क" },
@@ -249,9 +237,7 @@ export const STR = {
   "help.useFactor": { en: (f) => `Assessed value × ${f}`, hi: (f) => `निर्धारित मूल्य × ${f}` },
   "help.ageFactor": { en: (f) => `Adjusted value × ${f}`, hi: (f) => `समायोजित मूल्य × ${f}` },
   "help.occupancyFactor": { en: (f) => `Adjusted value × ${f}`, hi: (f) => `समायोजित मूल्य × ${f}` },
-  "help.baseTax": { en: (v) => `Core municipal tax on ${v} assessed value`, hi: (v) => `${v} निर्धारित मूल्य पर मूल नगरपालिका कर` },
-  "help.cess1pct": { en: "≈1% of assessed value", hi: "निर्धारित मूल्य का ≈1%" },
-  "help.cessSwm": { en: "≈1.5% of assessed value", hi: "निर्धारित मूल्य का ≈1.5%" },
+  "help.annualTax": { en: (v, rate) => `${v} × ${rate}% tax rate`, hi: (v, rate) => `${v} × ${rate}% कर दर` },
   "help.penalty": { en: (r, m) => `${r}% per month for ${m} months`, hi: (r, m) => `${m} माह के लिए ${r}% प्रति माह` },
   "help.totalDue": { en: "Tax after applied rebates and charges", hi: "लागू छूट और शुल्कों के बाद कर" },
 
@@ -280,29 +266,11 @@ export const STR = {
     hi: (occ, f, val) =>
       `रिकॉर्ड कहता है कि यह संपत्ति ${occ} है। मिलान वाला अधिभोग गुणक ${f} है, जिससे ${val} का अंतिम निर्धारित मूल्य मिलता है।`,
   },
-  "det.baseTax": {
-    en: (val, rate, base) =>
-      `The core municipal property tax on your final assessed value of ${val}. A real bill folds this into one ${rate}% headline rate; here it is that rate minus the three earmarked cesses below — not an extra charge. It comes to ${base}.`,
-    hi: (val, rate, base) =>
-      `आपके ${val} के अंतिम निर्धारित मूल्य पर मूल नगरपालिका संपत्ति कर। असली बिल इसे एक ${rate}% मुख्य दर में समेट देता है; यहाँ यह वह दर है, नीचे के तीन निर्दिष्ट उपकरों को घटाकर — कोई अतिरिक्त शुल्क नहीं। यह ${base} बनता है।`,
-  },
-  "det.libraryCess": {
-    en: (amt) =>
-      `A fixed levy funding public libraries in your ward — applied to every property regardless of usage. Municipal bills bundle it into the headline tax rate and never itemise it; this prototype shows it on its own line: ${amt}.`,
-    hi: (amt) =>
-      `आपके वार्ड में सार्वजनिक पुस्तकालयों के लिए एक निश्चित उगाही — हर संपत्ति पर, उपयोग चाहे जो हो। नगरपालिका बिल इसे मुख्य कर दर में मिला देते हैं और कभी अलग नहीं दिखाते; यह प्रोटोटाइप इसे अपनी अलग पंक्ति में दिखाता है: ${amt}।`,
-  },
-  "det.healthCess": {
-    en: (amt, tax) =>
-      `A fixed levy funding municipal primary health centres and sanitation drives — also applied to every property regardless of usage, and also hidden inside the headline rate on a real bill: ${amt}.`,
-    hi: (amt, tax) =>
-      `नगरपालिका प्राथमिक स्वास्थ्य केंद्रों और स्वच्छता अभियानों के लिए एक निश्चित उगाही — यह भी हर संपत्ति पर, उपयोग चाहे जो हो, और असली बिल में मुख्य दर के भीतर छिपी हुई: ${amt}।`,
-  },
-  "det.swmCess": {
-    en: (amt, tax) =>
-      `Funds collection, transport, and disposal of solid waste in your ward — charged to every property regardless of usage. Base property tax plus all three cesses equals your ${tax} annual property tax.`,
-    hi: (amt, tax) =>
-      `आपके वार्ड में ठोस अपशिष्ट के संग्रह, परिवहन और निपटान का वित्तपोषण — हर संपत्ति पर, उपयोग चाहे जो हो। मूल संपत्ति कर और तीनों उपकर मिलकर आपके ${tax} वार्षिक संपत्ति कर के बराबर हैं।`,
+  "det.annualTax": {
+    en: (rate, tax) =>
+      `The prototype applies a ${rate}% annual municipal tax rate to the final assessed value. That produces the tax amount before rebates or late-payment charges: ${tax}.`,
+    hi: (rate, tax) =>
+      `प्रोटोटाइप अंतिम निर्धारित मूल्य पर ${rate}% वार्षिक नगरपालिका कर दर लगाता है। इससे छूट या विलंब शुल्क से पहले का कर बनता है: ${tax}।`,
   },
   "det.penalty": {
     en: (reason, start, rate, before, months, total) =>
@@ -432,8 +400,8 @@ export const STR = {
   "note.fullTerms": { en: "Full terms", hi: "पूरी शर्तें" },
   "note.faq": { en: "FAQ", hi: "सामान्य प्रश्न" },
   "note.body": {
-    en: "This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations, cess splits and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.",
-    hi: "यह कोई सरकारी उत्पाद नहीं है और किसी नगरपालिका निकाय या कर पोर्टल से संबद्ध नहीं है। सभी संपत्ति डेटा, गणनाएँ, उपकर विभाजन और भुगतान इतिहास मॉक और काल्पनिक हैं। भुगतान सिम्युलेटेड है; भुगतान-तरीके का चयन दिखावटी है और कोई लेन-देन नहीं होता। यहाँ बनी कोई भी रसीद या QR कोड केवल प्रदर्शन है और भुगतान का वैध प्रमाण नहीं है। बिल स्पष्टीकरण और आपत्ति ग्रहण आज काम करते हैं; नगरपालिका सत्यापन मॉक है।",
+    en: "This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.",
+    hi: "यह कोई सरकारी उत्पाद नहीं है और किसी नगरपालिका निकाय या कर पोर्टल से संबद्ध नहीं है। सभी संपत्ति डेटा, गणनाएँ और भुगतान इतिहास मॉक और काल्पनिक हैं। भुगतान सिम्युलेटेड है; भुगतान-तरीके का चयन दिखावटी है और कोई लेन-देन नहीं होता। यहाँ बनी कोई भी रसीद या QR कोड केवल प्रदर्शन है और भुगतान का वैध प्रमाण नहीं है। बिल स्पष्टीकरण और आपत्ति ग्रहण आज काम करते हैं; नगरपालिका सत्यापन मॉक है।",
   },
 
   // ---- /terms ----
@@ -457,12 +425,12 @@ export const STR = {
     hi: "यह “यह राशि क्यों?” में दिखाई गई इकाई-क्षेत्र विधि का उपयोग करता है: आपके निर्मित क्षेत्र को प्रति वर्ग मीटर के प्रकाशित मूल्य से गुणा किया जाता है, फिर उपयोग, भवन की आयु और अधिभोग के गुणकों से समायोजित किया जाता है। उस निर्धारित मूल्य पर एक नगरपालिका कर दर लगाकर वार्षिक कर मिलता है, छूट या किसी विलंब शुल्क से पहले।",
   },
   "faq.q2": {
-    en: "What are library, health, and SWM cess, and why are they separate from my tax?",
-    hi: "पुस्तकालय, स्वास्थ्य और SWM उपकर क्या हैं, और ये मेरे कर से अलग क्यों हैं?",
+    en: "What do the use, age and occupancy factors mean?",
+    hi: "उपयोग, आयु और अधिभोग के गुणकों का क्या मतलब है?",
   },
   "faq.a2": {
-    en: "They are fixed levies bundled into your total tax that fund specific municipal services — libraries, primary health and sanitation, and solid-waste collection. A real bill folds them into one rate. This app shows them on their own lines so you can see what each rupee actually funds, instead of one unexplained lump sum.",
-    hi: "ये आपके कुल कर में शामिल निश्चित उगाहियाँ हैं जो विशिष्ट नगरपालिका सेवाओं का वित्तपोषण करती हैं — पुस्तकालय, प्राथमिक स्वास्थ्य और स्वच्छता, और ठोस-अपशिष्ट संग्रह। असली बिल इन्हें एक दर में समेट देता है। यह ऐप इन्हें अलग-अलग पंक्तियों में दिखाता है ताकि आप देख सकें कि हर रुपया वाकई किस चीज़ का वित्तपोषण करता है, एक अस्पष्ट एकमुश्त राशि के बजाय।",
+    en: "They adjust the assessed value to fit the property. The use factor reflects how the property is used, such as a home or a small shop; the age factor lowers the value of older buildings; and the occupancy factor reflects how the property is occupied, such as self-occupied. The factors and rates in this prototype are illustrative — a real bill uses your municipality's own.",
+    hi: "ये निर्धारित मूल्य को संपत्ति के अनुसार समायोजित करते हैं। उपयोग गुणक बताता है कि संपत्ति कैसे इस्तेमाल होती है, जैसे आवास या छोटी दुकान; आयु गुणक पुराने भवनों का मूल्य घटाता है; और अधिभोग गुणक संपत्ति के अधिभोग की स्थिति दर्शाता है, जैसे स्व-अधिकृत। इस प्रोटोटाइप में गुणक और दरें केवल उदाहरण हैं — असली बिल में आपकी नगरपालिका की अपनी दरें होती हैं।",
   },
   "faq.q3": { en: "I think my bill has an error — what do I do?", hi: "मुझे लगता है मेरे बिल में गलती है — मैं क्या करूँ?" },
   "faq.a3": {

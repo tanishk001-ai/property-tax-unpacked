@@ -21,12 +21,10 @@ function payModeLabel(t: TFn, mode: PayMode): string {
 // leaves a dispute in a mixed state.
 type DisputeId =
   | "built-up-area" | "use-factor" | "age-factor" | "occupancy-factor"
-  | "base-tax" | "library-cess" | "health-cess" | "swm-cess"
   | "annual-tax" | "applied-rebate" | "late-charge" | "amount-due";
 
 const DISPUTE_IDS: DisputeId[] = [
   "built-up-area", "use-factor", "age-factor", "occupancy-factor",
-  "base-tax", "library-cess", "health-cess", "swm-cess",
   "annual-tax", "applied-rebate", "late-charge", "amount-due",
 ];
 
@@ -36,10 +34,6 @@ function disputeLabel(t: TFn, lang: Lang, property: Property, id: DisputeId): st
     case "use-factor": return t("line.useFactor", translateData(lang, property.usage));
     case "age-factor": return t("line.ageFactor", property.age);
     case "occupancy-factor": return t("line.occupancyFactor", translateData(lang, property.occupancy));
-    case "base-tax": return t("line.baseTax");
-    case "library-cess": return t("line.libraryCess");
-    case "health-cess": return t("line.healthCess");
-    case "swm-cess": return t("line.swmCess");
     case "annual-tax": return t("line.annualPropertyTax");
     case "applied-rebate": return t("line.appliedRebate");
     case "late-charge": return t("line.latePaymentCharge");
@@ -140,17 +134,6 @@ function calc(property: Property) {
   }));
 
   return { areaValue, usageValue, ageValue, occupancyValue, coreTax, applied, rebateTotal, beforePenalty, penaltyAmount, unclaimed, due: beforePenalty + penaltyAmount };
-}
-
-// Display-only decomposition of the existing annual property tax (coreTax) into
-// base tax + three earmarked cesses. `base` is the remainder so the four parts
-// always sum to exactly coreTax — this changes no calculation, only presentation.
-function cessSplit(amounts: ReturnType<typeof calc>) {
-  const library = Math.round(amounts.occupancyValue * 0.01);
-  const health = Math.round(amounts.occupancyValue * 0.01);
-  const swm = Math.round(amounts.occupancyValue * 0.015); // Solid Waste Management cess ≈ 1.5%
-  const base = amounts.coreTax - library - health - swm;
-  return { base, library, health, swm };
 }
 
 function Arrow({ direction = "right" }: { direction?: "right" | "down" | "up" | "left" }) {
@@ -354,7 +337,6 @@ function DetailCard({ title, children, tone }: { title: string; children: ReactN
 function Breakdown({ property, onBack, onPay, onDispute }: { property: Property; onBack: () => void; onPay: () => void; onDispute: (line?: DisputeId) => void }) {
   const { t, lang } = useI18n();
   const amounts = useMemo(() => calc(property), [property]);
-  const cess = useMemo(() => cessSplit(amounts), [amounts]);
   const [openLine, setOpenLine] = useState<string | null>(null);
   const ratePct = (property.taxRate * 100).toFixed(0);
   const usageT = translateData(lang, property.usage);
@@ -366,10 +348,7 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
     { id: "usage", disputeId: "use-factor", label: t("line.useFactor", usageT), amount: amounts.usageValue, helper: t("help.useFactor", property.usageFactor.toFixed(2)), detail: <p>{t("det.useFactor", usageT, property.usageFactor.toFixed(2), rupees(amounts.usageValue))}</p> },
     { id: "age", disputeId: "age-factor", label: t("line.ageFactor", property.age), amount: amounts.ageValue, helper: t("help.ageFactor", property.ageFactor.toFixed(2)), detail: <p>{t("det.ageFactor", property.age, Math.round((1 - property.ageFactor) * 100), property.ageFactor.toFixed(2), rupees(amounts.ageValue))}</p> },
     { id: "occupancy", disputeId: "occupancy-factor", label: t("line.occupancyFactor", occT), amount: amounts.occupancyValue, helper: t("help.occupancyFactor", property.occupancyFactor.toFixed(2)), detail: <p>{t("det.occupancyFactor", occT, property.occupancyFactor.toFixed(2), occV)}</p> },
-    { id: "base-tax", disputeId: "base-tax", label: t("line.baseTax"), amount: cess.base, helper: t("help.baseTax", occV), detail: <p>{t("det.baseTax", occV, ratePct, rupees(cess.base))}</p> },
-    { id: "library-cess", disputeId: "library-cess", label: t("line.libraryCess"), amount: cess.library, helper: t("help.cess1pct"), detail: <p>{t("det.libraryCess", rupees(cess.library))}</p> },
-    { id: "health-cess", disputeId: "health-cess", label: t("line.healthCess"), amount: cess.health, helper: t("help.cess1pct"), detail: <p>{t("det.healthCess", rupees(cess.health), rupees(amounts.coreTax))}</p> },
-    { id: "swm-cess", disputeId: "swm-cess", label: t("line.swmCess"), amount: cess.swm, helper: t("help.cessSwm"), detail: <p>{t("det.swmCess", rupees(cess.swm), rupees(amounts.coreTax))}</p> },
+    { id: "annual-tax", disputeId: "annual-tax", label: t("line.annualPropertyTax"), amount: amounts.coreTax, helper: t("help.annualTax", occV, ratePct), detail: <p>{t("det.annualTax", ratePct, rupees(amounts.coreTax))}</p> },
   ];
   const summaryLines: Line[] = [
     ...(property.penalty ? [{ id: "penalty", disputeId: "late-charge" as const, label: t("line.latePaymentCharge"), amount: amounts.penaltyAmount, sign: "plus" as const, helper: t("help.penalty", property.penalty.rate, property.penalty.months), attention: "warning" as const, detail: <p>{t("det.penalty", t("pen.reason", property.fy, formatDateLocalised(lang, property.dueDate)), formatDateLocalised(lang, property.penalty.startDate), property.penalty.rate, rupees(amounts.beforePenalty), property.penalty.months, rupees(amounts.penaltyAmount))}</p> }] : []),
@@ -396,7 +375,7 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
           <dl className="facts-grid"><Stat label={t("rec.builtUpArea")}>{property.builtUpArea} m²</Stat><Stat label={t("rec.zone")}>{translateData(lang, property.zone)}</Stat><Stat label={t("rec.usage")}>{usageT}</Stat><Stat label={t("rec.buildingAge")}>{t("rec.years", property.age)}</Stat><Stat label={t("rec.occupancy")}>{occT}</Stat><Stat label={t("rec.ownerCategory")}>{translateData(lang, property.ownerCategory)}</Stat></dl>
         </section>
 
-        <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">{t("calc.title")}</h2><p>{t("calc.method")}</p></div></div><div className="formula-card"><div className="formula-caption">{t("calc.formulaCaption")}</div><div className="formula-text"><span>{t("calc.f.area")}</span><i>×</i><span>{t("calc.f.uav")}</span><i>×</i><span>{t("calc.f.use")}</span><i>×</i><span>{t("calc.f.age")}</span><i>×</i><span>{t("calc.f.occupancy")}</span></div><p>{t("calc.thenRate")}</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => line.disputeId && onDispute(line.disputeId)} />)}</div><p className="muted-copy">{t("calc.cessNote", ratePct, rupees(amounts.coreTax))}</p></section>
+        <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">{t("calc.title")}</h2><p>{t("calc.method")}</p></div></div><div className="formula-card"><div className="formula-caption">{t("calc.formulaCaption")}</div><div className="formula-text"><span>{t("calc.f.area")}</span><i>×</i><span>{t("calc.f.uav")}</span><i>×</i><span>{t("calc.f.use")}</span><i>×</i><span>{t("calc.f.age")}</span><i>×</i><span>{t("calc.f.occupancy")}</span></div><p>{t("calc.thenRate")}</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => line.disputeId && onDispute(line.disputeId)} />)}</div></section>
 
         <section className="calculation-section" aria-labelledby="adjustments-title"><div className="section-heading"><span>03</span><div><h2 id="adjustments-title">{t("adj.title")}</h2><p>{t("adj.sub")}</p></div></div>
           {amounts.applied.length > 0 ? <DetailCard title={t("adj.alreadyApplied")}><div className="mini-list">{amounts.applied.map((rebate) => <div key={rebate.id}><span><Icon name="check" />{translateData(lang, rebate.title)}</span><b>−{rupees(rebate.amount)}</b></div>)}</div></DetailCard> : <DetailCard title={t("adj.noRebates")}><p className="muted-copy">{t("adj.noRebatesBody")}</p></DetailCard>}
