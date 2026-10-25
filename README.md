@@ -22,21 +22,24 @@ panel, no multi-city support, no login system beyond a mock property lookup.
 
 Open any demo property directly (the links open the live app):
 
-- [**DEMO-2048**](https://property-tax-unpacked.vercel.app/?id=DEMO-2048) — a clean bill with rebates already applied
-- [**DEMO-7719**](https://property-tax-unpacked.vercel.app/?id=DEMO-7719) — a bill with a rebate the owner has not claimed
-- [**DEMO-3982**](https://property-tax-unpacked.vercel.app/?id=DEMO-3982) — an overdue bill with a late-payment charge
+- [**DEMO-2048**](https://property-tax-unpacked.vercel.app/bill/DEMO-2048) — a clean bill with rebates already applied
+- [**DEMO-7719**](https://property-tax-unpacked.vercel.app/bill/DEMO-7719) — a bill with a rebate the owner has not claimed
+- [**DEMO-3982**](https://property-tax-unpacked.vercel.app/bill/DEMO-3982) — an overdue bill with a late-payment charge
 
-Add `&view=breakdown` to any link to land on the "Why this amount?" breakdown,
-for example `/?id=DEMO-7719&view=breakdown`.
+Add `/breakdown` to any link to land on the "Why this amount?" breakdown, for
+example `/bill/DEMO-7719/breakdown`.
 
 ## What's actually built
 
 - **Property lookup** — three seeded demo properties, each telling a different
   story: a clean bill, a bill with a missed rebate, and an overdue bill with a
   penalty. Every bill is for FY 2026–27 and the dates come from the property data
-- **Shareable links** — `/?id=DEMO-7719` opens that bill and
-  `/?id=DEMO-7719&view=breakdown` its breakdown. The browser back and forward
-  buttons move between the landing page, a bill and its breakdown
+- **Shareable links** — `/bill/DEMO-7719` opens that bill and
+  `/bill/DEMO-7719/breakdown` its breakdown. The three demo bills are
+  prerendered, so a shared link shows the bill immediately. An unknown id shows
+  the landing page with the "not found" message, and older `/?id=DEMO-7719`
+  links redirect to the new paths. The browser back and forward buttons move
+  between the landing page, a bill and its breakdown
 - **Line-by-line calculation breakdown** — the unit-area method
   (area × unit-area value × use × age × occupancy factors, then the tax rate is
   applied). Modelled on the unit-area method used by several Indian municipal

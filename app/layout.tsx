@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { I18nProvider } from "./i18n";
+import { SessionProvider } from "./session";
 
 export const metadata: Metadata = {
   title: "Unpacked · Property bill explainer",
@@ -12,7 +13,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </I18nProvider>
         <Analytics />
       </body>
     </html>
