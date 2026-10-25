@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { translate, type StrKey } from "./strings";
+import { trackEvent } from "./analytics";
 
 export type Lang = "en" | "hi";
 
@@ -59,12 +60,17 @@ export function useDocumentTitle(key: StrKey) {
 
 export function LangToggle({ compact = false }: { compact?: boolean }) {
   const { lang, setLang, t } = useI18n();
+  const choose = (next: Lang) => {
+    if (next === lang) return;
+    trackEvent("language_switched", { to: next });
+    setLang(next);
+  };
   return (
     <div className={`lang-toggle ${compact ? "lang-toggle-compact" : ""}`} role="group" aria-label={t("lang.group")}>
-      <button type="button" className={lang === "en" ? "is-active" : ""} aria-pressed={lang === "en"} onClick={() => setLang("en")}>
+      <button type="button" className={lang === "en" ? "is-active" : ""} aria-pressed={lang === "en"} onClick={() => choose("en")}>
         EN
       </button>
-      <button type="button" className={lang === "hi" ? "is-active" : ""} aria-pressed={lang === "hi"} onClick={() => setLang("hi")}>
+      <button type="button" className={lang === "hi" ? "is-active" : ""} aria-pressed={lang === "hi"} onClick={() => choose("hi")}>
         हिं
       </button>
     </div>

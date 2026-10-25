@@ -7,6 +7,7 @@ import propertyFixtures from "./data/properties.json";
 import { useI18n, useDocumentTitle, LangToggle, type Lang } from "./i18n";
 import { formatDateLocalised, translate, translateData, type StrKey } from "./strings";
 import { makeReference } from "./reference";
+import { trackEvent } from "./analytics";
 
 type TFn = (key: StrKey, ...args: (string | number)[]) => string;
 
@@ -215,7 +216,7 @@ function PrototypeNote({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function Lookup({ onChoose, notFound, onClearNotFound }: { onChoose: (property: Property) => void; notFound: boolean; onClearNotFound: () => void }) {
+function Lookup({ onChoose, notFound, onClearNotFound }: { onChoose: (property: Property, source: "sample" | "search") => void; notFound: boolean; onClearNotFound: () => void }) {
   const { t, lang } = useI18n();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -227,7 +228,7 @@ function Lookup({ onChoose, notFound, onClearNotFound }: { onChoose: (property: 
     const match = properties.find((property) => property.id.toLowerCase() === value.trim().toLowerCase());
     if (match) {
       setError("");
-      onChoose(match);
+      onChoose(match, "search");
     } else {
       setError(t("lookup.error"));
     }
@@ -254,7 +255,7 @@ function Lookup({ onChoose, notFound, onClearNotFound }: { onChoose: (property: 
             <button className="button button-primary" type="submit">{t("lookup.viewBill")} <Arrow /></button>
           </div>
           <div className="lookup-subrow">
-            <button className="text-button" type="button" onClick={() => onChoose(properties[1])}>{t("lookup.trySample")} <Arrow /></button>
+            <button className="text-button" type="button" onClick={() => onChoose(properties[1], "sample")}>{t("lookup.trySample")} <Arrow /></button>
             {shownError ? <span id="lookup-error" className="form-error" role="alert">{shownError}</span> : <span>{t("lookup.hint")}</span>}
           </div>
         </motion.form>
@@ -264,7 +265,7 @@ function Lookup({ onChoose, notFound, onClearNotFound }: { onChoose: (property: 
         <div className="section-kicker"><span>{t("samples.kicker")}</span><h2 id="samples-title">{t("samples.title")}</h2></div>
         <div className="sample-grid">
           {properties.map((property, index) => (
-            <motion.a key={property.id} href={urlFor(property.id, "bill")} className={`sample-card sample-${property.tone}`} onClick={(event) => { if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onChoose(property); }} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.2 + index * 0.06 }}>
+            <motion.a key={property.id} href={urlFor(property.id, "bill")} className={`sample-card sample-${property.tone}`} onClick={(event) => { if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onChoose(property, "sample"); }} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.2 + index * 0.06 }}>
               <span className="sample-index">0{index + 1}</span>
               <span className="sample-copy"><strong>{translateData(lang, property.label)}</strong><small>{property.id}</small></span>
               <Arrow />
@@ -410,7 +411,15 @@ function Breakdown({ property, onBack, onHome, onPay, onDispute }: { property: P
     ...(property.penalty ? [{ id: "penalty", disputeId: "late-charge" as const, label: t("line.latePaymentCharge"), amount: amounts.penaltyAmount, sign: "plus" as const, helper: t("help.penalty", property.penalty.rate, property.penalty.months), attention: "warning" as const, detail: <p>{t("det.penalty", t("pen.reason", property.fy, formatDateLocalised(lang, property.dueDate)), formatDateLocalised(lang, property.penalty.startDate), property.penalty.rate, rupees(amounts.beforePenalty), property.penalty.months, rupees(amounts.penaltyAmount))}</p> }] : []),
     { id: "total", disputeId: "amount-due", label: t("line.amountDue"), amount: amounts.due, sign: "equals" as const, helper: t("help.totalDue"), detail: <p>{t("det.total")}</p> },
   ];
-  const toggle = (id: string) => setOpenLine((current) => current === id ? null : id);
+  const toggle = (id: string) => {
+    if (openLine !== id) trackEvent("line_expanded", { id: property.id, line: id });
+    setOpenLine(openLine === id ? null : id);
+  };
+  const question = (disputeId: DisputeId | undefined) => {
+    if (!disputeId) return;
+    trackEvent("question_line_clicked", { id: property.id, line: disputeId });
+    onDispute(disputeId);
+  };
 
   return (
     <>
@@ -431,12 +440,12 @@ function Breakdown({ property, onBack, onHome, onPay, onDispute }: { property: P
           <dl className="facts-grid"><Stat label={t("rec.builtUpArea")}>{t("unit.sqm", property.builtUpArea)}</Stat><Stat label={t("rec.zone")}>{translateData(lang, property.zone)}</Stat><Stat label={t("rec.usage")}>{usageT}</Stat><Stat label={t("rec.buildingAge")}>{t("rec.years", property.age)}</Stat><Stat label={t("rec.occupancy")}>{occT}</Stat><Stat label={t("rec.ownerCategory")}>{translateData(lang, property.ownerCategory)}</Stat></dl>
         </section>
 
-        <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">{t("calc.title")}</h2><p>{t("calc.method")}</p></div></div><div className="formula-card"><div className="formula-caption">{t("calc.formulaCaption")}</div><div className="formula-text"><span>{t("calc.f.area")}</span><i>×</i><span>{t("calc.f.uav")}</span><i>×</i><span>{t("calc.f.use")}</span><i>×</i><span>{t("calc.f.age")}</span><i>×</i><span>{t("calc.f.occupancy")}</span></div><p>{t("calc.thenRate")}</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => line.disputeId && onDispute(line.disputeId)} />)}</div></section>
+        <section className="calculation-section" aria-labelledby="calculation-title"><div className="section-heading"><span>02</span><div><h2 id="calculation-title">{t("calc.title")}</h2><p>{t("calc.method")}</p></div></div><div className="formula-card"><div className="formula-caption">{t("calc.formulaCaption")}</div><div className="formula-text"><span>{t("calc.f.area")}</span><i>×</i><span>{t("calc.f.uav")}</span><i>×</i><span>{t("calc.f.use")}</span><i>×</i><span>{t("calc.f.age")}</span><i>×</i><span>{t("calc.f.occupancy")}</span></div><p>{t("calc.thenRate")}</p></div><div className="calculation-list">{formulaLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => question(line.disputeId)} />)}</div></section>
 
         <section className="calculation-section" aria-labelledby="adjustments-title"><div className="section-heading"><span>03</span><div><h2 id="adjustments-title">{t("adj.title")}</h2><p>{t("adj.sub")}</p></div></div>
           {amounts.applied.length > 0 ? <DetailCard title={t("adj.alreadyApplied")}><div className="mini-list">{amounts.applied.map((rebate) => <div key={rebate.id}><span><Icon name="check" />{translateData(lang, rebate.title)}</span><b>−{rupees(rebate.amount)}</b></div>)}</div></DetailCard> : <DetailCard title={t("adj.noRebates")}><p className="muted-copy">{t("adj.noRebatesBody")}</p></DetailCard>}
           {amounts.unclaimed.length > 0 && <DetailCard title={t("adj.stillEligible")} tone="saving"><p className="muted-copy">{t("adj.stillEligibleBody")}</p>{amounts.unclaimed.map((rebate) => <div className="unclaimed-row" key={rebate.id}><div><strong>{translateData(lang, rebate.title)}</strong><span>{translateData(lang, rebate.reason)}</span></div><b>{t("adj.couldSave", rupees(rebate.amount))}</b></div>)}</DetailCard>}
-          <div className="calculation-list adjustment-lines">{summaryLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => line.disputeId && onDispute(line.disputeId)} />)}</div>
+          <div className="calculation-list adjustment-lines">{summaryLines.map((line) => <CalculationLine key={line.id} line={line} open={openLine === line.id} onToggle={() => toggle(line.id)} onQuestion={() => question(line.disputeId)} />)}</div>
         </section>
         <section className="next-step"><div><span className="eyebrow"><span className="eyebrow-dot" />{t("next.eyebrow")}</span><h2>{t("next.h2")}</h2><p>{t("next.body")}</p></div><button className="button button-outline" onClick={() => onDispute()} type="button">{t("action.raiseDispute")} <Arrow /></button></section>
       </main>
@@ -465,6 +474,7 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
   const [receipt, setReceipt] = useState<PaymentResult | null>(null);
 
   function simulate() {
+    trackEvent("payment_simulated", { id: property.id, mode });
     setReceipt({
       reference: makeReference("RCT", property.id),
       amount: amounts.due,
@@ -537,7 +547,7 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
   }
   const lineLabel = disputeLabel(t, lang, property, lineId);
   const reason = t("disp.reason", lineLabel, property.id);
-  return <Modal onClose={onClose}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" key={`${lineId}-${lang}`} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
+  return <Modal onClose={onClose}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); trackEvent("dispute_submitted", { id: property.id, line: lineId }); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" key={`${lineId}-${lang}`} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
 }
 
 export default function Home() {
@@ -554,6 +564,7 @@ export default function Home() {
   const lastPayment = propertyId ? payments[propertyId] ?? null : null;
   const paid = lastPayment !== null;
   const firstRoute = useRef(true);
+  const deepLinkTracked = useRef(false);
 
   // Read the current URL into screen state (initial load, browser back/forward).
   const syncFromUrl = useCallback(() => {
@@ -568,6 +579,11 @@ export default function Home() {
   useEffect(() => {
     const route = syncFromUrl();
     if (route.unknownId !== null) replaceUrl("/");
+    if (route.property && !deepLinkTracked.current) {
+      deepLinkTracked.current = true;
+      trackEvent("property_opened", { id: route.property.id, source: "deeplink" });
+      if (route.view === "breakdown") trackEvent("breakdown_opened", { id: route.property.id });
+    }
     window.addEventListener("popstate", syncFromUrl);
     return () => window.removeEventListener("popstate", syncFromUrl);
   }, [syncFromUrl]);
@@ -599,13 +615,18 @@ export default function Home() {
     setModal(null);
   }
 
-  function openProperty(next: Property) {
+  function openProperty(next: Property, source: "sample" | "search") {
     // Opening from the landing page starts the demo fresh (no earlier simulated payment).
     setPayments((current) => { const copy = { ...current }; delete copy[next.id]; return copy; });
     goTo(next, "bill");
+    trackEvent("property_opened", { id: next.id, source });
+  }
+  function openBreakdown(current: Property) {
+    goTo(current, "breakdown");
+    trackEvent("breakdown_opened", { id: current.id });
   }
   function openDispute(line?: DisputeId) { setDisputeLine(line); setDisputeKey((n) => n + 1); setModal("dispute"); }
 
   if (!property) return <Lookup onChoose={openProperty} notFound={notFound} onClearNotFound={() => setNotFound(false)} />;
-  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => goTo(property, "breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={() => goUp(null, "bill")} onHome={() => goUp(null, "bill")} /> : <Breakdown property={property} onBack={() => goUp(property, "bill")} onHome={() => goUp(null, "bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPayments((current) => ({ ...current, [property.id]: result })); if (screen === "breakdown") goTo(property, "bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
+  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => openBreakdown(property)} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={() => goUp(null, "bill")} onHome={() => goUp(null, "bill")} /> : <Breakdown property={property} onBack={() => goUp(property, "bill")} onHome={() => goUp(null, "bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPayments((current) => ({ ...current, [property.id]: result })); if (screen === "breakdown") goTo(property, "bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
 }
