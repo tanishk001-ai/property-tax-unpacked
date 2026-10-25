@@ -54,7 +54,16 @@ export function useI18n() {
 export function useDocumentTitle(key: StrKey) {
   const { t } = useI18n();
   useEffect(() => {
-    document.title = t(key);
+    const title = t(key);
+    const apply = () => {
+      if (document.title !== title) document.title = title;
+    };
+    apply();
+    // Next re-renders its own <title> from the layout metadata after hydration,
+    // which would put the English title back; re-apply when that happens.
+    const observer = new MutationObserver(apply);
+    observer.observe(document.head, { childList: true, characterData: true, subtree: true });
+    return () => observer.disconnect();
   }, [t, key]);
 }
 
