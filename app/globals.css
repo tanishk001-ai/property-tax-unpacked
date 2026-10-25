@@ -45,7 +45,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .section-kicker > span { color:var(--muted); font-size:.77rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; }
 .section-kicker h2 { max-width:31rem; margin:0; font-size:clamp(1.45rem, 3vw, 2.25rem); line-height:1.04; letter-spacing:-.045em; }
 .sample-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:.8rem; }
-.sample-card { display:flex; align-items:center; gap:.7rem; min-height:8.6rem; border:1px solid var(--line); border-radius:1rem; padding:1.05rem; background:rgba(255,255,253,.56); color:var(--ink); text-align:left; }
+.sample-card { display:flex; align-items:center; gap:.7rem; min-height:8.6rem; border:1px solid var(--line); border-radius:1rem; padding:1.05rem; background:rgba(255,255,253,.56); color:var(--ink); text-align:left; text-decoration:none; }
 .sample-card:hover { transform:translateY(-.15rem); border-color:rgba(23,35,30,.25); box-shadow:0 .75rem 2rem rgba(25,36,30,.07); }
 .sample-card:active { transform:scale(.97); }
 .sample-clear { background:#eef5ef; }.sample-rebate { background:#f8f0db; }.sample-penalty { background:#f6e8e1; }

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FormEvent, ReactNode, useMemo, useState } from "react";
+import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import propertyFixtures from "./data/properties.json";
 import { useI18n, useDocumentTitle, LangToggle, type Lang } from "./i18n";
@@ -95,6 +95,42 @@ type Line = {
 };
 
 const properties = propertyFixtures as Property[];
+
+// ---- URL <-> screen state -------------------------------------------------
+// /?id=DEMO-7719 opens that bill; add &view=breakdown for its breakdown; "/" is the
+// landing page. Navigation uses history.pushState so the browser back/forward
+// buttons move between landing, bill and breakdown without a full reload.
+type View = "bill" | "breakdown";
+
+function urlFor(id: string | null, view: View) {
+  if (!id) return "/";
+  return `/?id=${encodeURIComponent(id)}${view === "breakdown" ? "&view=breakdown" : ""}`;
+}
+
+function parseUrl(): { property: Property | null; view: View; unknownId: string | null } {
+  const params = new URLSearchParams(window.location.search);
+  const rawId = params.get("id");
+  if (!rawId) return { property: null, view: "bill", unknownId: null };
+  const match = properties.find((candidate) => candidate.id.toLowerCase() === rawId.trim().toLowerCase());
+  if (!match) return { property: null, view: "bill", unknownId: rawId };
+  return { property: match, view: params.get("view") === "breakdown" ? "breakdown" : "bill", unknownId: null };
+}
+
+// Every entry we push remembers the URL it was reached from, so a "Back" button
+// can step back in history only when the previous entry really is the parent screen.
+type HistoryMeta = { idx?: number; from?: string } | null;
+function historyMeta(): HistoryMeta {
+  return window.history.state as HistoryMeta;
+}
+function currentUrl() {
+  return window.location.pathname + window.location.search;
+}
+function pushUrl(url: string) {
+  window.history.pushState({ idx: (historyMeta()?.idx ?? 0) + 1, from: currentUrl() }, "", url);
+}
+function replaceUrl(url: string) {
+  window.history.replaceState({ idx: historyMeta()?.idx ?? 0, from: historyMeta()?.from }, "", url);
+}
 const spring = { type: "spring" as const, bounce: 0, duration: 0.4 };
 const money = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -179,11 +215,12 @@ function PrototypeNote({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function Lookup({ onChoose }: { onChoose: (property: Property) => void }) {
+function Lookup({ onChoose, notFound, onClearNotFound }: { onChoose: (property: Property) => void; notFound: boolean; onClearNotFound: () => void }) {
   const { t, lang } = useI18n();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const reduced = useReducedMotion();
+  const shownError = error || (notFound ? t("lookup.error") : "");
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -213,12 +250,12 @@ function Lookup({ onChoose }: { onChoose: (property: Property) => void }) {
         <motion.form onSubmit={submit} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.15 }} className="lookup-card">
           <label htmlFor="property-id">{t("lookup.label")}</label>
           <div className="lookup-controls">
-            <input id="property-id" value={value} onChange={(event) => { setValue(event.target.value.toUpperCase()); setError(""); }} placeholder={t("lookup.placeholder")} autoCapitalize="characters" aria-describedby={error ? "lookup-error" : undefined} />
+            <input id="property-id" value={value} onChange={(event) => { setValue(event.target.value.toUpperCase()); setError(""); onClearNotFound(); }} placeholder={t("lookup.placeholder")} autoCapitalize="characters" aria-describedby={shownError ? "lookup-error" : undefined} />
             <button className="button button-primary" type="submit">{t("lookup.viewBill")} <Arrow /></button>
           </div>
           <div className="lookup-subrow">
             <button className="text-button" type="button" onClick={() => onChoose(properties[1])}>{t("lookup.trySample")} <Arrow /></button>
-            {error ? <span id="lookup-error" className="form-error" role="alert">{error}</span> : <span>{t("lookup.hint")}</span>}
+            {shownError ? <span id="lookup-error" className="form-error" role="alert">{shownError}</span> : <span>{t("lookup.hint")}</span>}
           </div>
         </motion.form>
       </section>
@@ -227,11 +264,11 @@ function Lookup({ onChoose }: { onChoose: (property: Property) => void }) {
         <div className="section-kicker"><span>{t("samples.kicker")}</span><h2 id="samples-title">{t("samples.title")}</h2></div>
         <div className="sample-grid">
           {properties.map((property, index) => (
-            <motion.button key={property.id} className={`sample-card sample-${property.tone}`} type="button" onClick={() => onChoose(property)} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.2 + index * 0.06 }}>
+            <motion.a key={property.id} href={urlFor(property.id, "bill")} className={`sample-card sample-${property.tone}`} onClick={(event) => { if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onChoose(property); }} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.2 + index * 0.06 }}>
               <span className="sample-index">0{index + 1}</span>
               <span className="sample-copy"><strong>{translateData(lang, property.label)}</strong><small>{property.id}</small></span>
               <Arrow />
-            </motion.button>
+            </motion.a>
           ))}
         </div>
       </section>
@@ -262,7 +299,7 @@ function Stat({ label, children }: { label: string; children: ReactNode }) {
   return <div className="property-stat"><dt>{label}</dt><dd>{children}</dd></div>;
 }
 
-function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, lastPayment }: { property: Property; onExplain: () => void; onPay: () => void; onDispute: () => void; onBack: () => void; paid: boolean; lastPayment: PaymentResult | null }) {
+function BillSummary({ property, onExplain, onPay, onDispute, onBack, onHome, paid, lastPayment }: { property: Property; onExplain: () => void; onPay: () => void; onDispute: () => void; onBack: () => void; onHome: () => void; paid: boolean; lastPayment: PaymentResult | null }) {
   const { t, lang } = useI18n();
   const amounts = useMemo(() => calc(property), [property]);
   const hasSaving = amounts.unclaimed.length > 0;
@@ -276,9 +313,9 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, paid, last
 
   return (
     <>
-      <Header property={property} onHome={() => window.location.reload()} onBack={onBack} screen="bill" />
+      <Header property={property} onHome={onHome} onBack={onBack} screen="bill" />
       <main className="bill-main page-width">
-        <div className="breadcrumb"><button onClick={() => window.location.reload()} type="button">{t("crumb.allProperties")}</button><Arrow /> <span>{t("crumb.billSummary")}</span></div>
+        <div className="breadcrumb"><button onClick={onHome} type="button">{t("crumb.allProperties")}</button><Arrow /> <span>{t("crumb.billSummary")}</span></div>
         <section className="bill-hero" aria-labelledby="bill-title">
           <div className="bill-context">
             <div className={`status-badge ${paid ? "status-paid" : isOverdue ? "status-overdue" : hasSaving ? "status-saving" : "status-due"}`}>
@@ -349,7 +386,7 @@ function DetailCard({ title, children, tone }: { title: string; children: ReactN
   return <section className={`detail-card ${tone ? `detail-${tone}` : ""}`}><div className="detail-card-title">{tone === "saving" ? <Icon name="info" /> : tone === "warning" ? <Icon name="warning" /> : <Icon name="receipt" />}<h3>{title}</h3></div>{children}</section>;
 }
 
-function Breakdown({ property, onBack, onPay, onDispute }: { property: Property; onBack: () => void; onPay: () => void; onDispute: (line?: DisputeId) => void }) {
+function Breakdown({ property, onBack, onHome, onPay, onDispute }: { property: Property; onBack: () => void; onHome: () => void; onPay: () => void; onDispute: (line?: DisputeId) => void }) {
   const { t, lang } = useI18n();
   const amounts = useMemo(() => calc(property), [property]);
   const [openLine, setOpenLine] = useState<string | null>(null);
@@ -377,7 +414,7 @@ function Breakdown({ property, onBack, onPay, onDispute }: { property: Property;
 
   return (
     <>
-      <Header property={property} onHome={() => window.location.reload()} onBack={onBack} screen="breakdown" />
+      <Header property={property} onHome={onHome} onBack={onBack} screen="breakdown" />
       <main className="breakdown-main page-width">
         <div className="breadcrumb"><button onClick={onBack} type="button">{t("crumb.billSummary")}</button><Arrow /> <span>{t("crumb.whyThisAmount")}</span></div>
         <section className="explain-intro"><div><span className="eyebrow"><span className="eyebrow-dot" />{t("bd.eyebrow")}</span><h1>{t("bd.h1", rupees(amounts.due))}</h1><p>{t("bd.intro")}</p></div><div className="explain-total"><span>{t("bill.amountDue")}</span><strong>{rupees(amounts.due)}</strong><small>{t("bd.due", formatDateLocalised(lang, property.dueDate))}</small></div></section>
@@ -506,16 +543,69 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
 export default function Home() {
   useDocumentTitle("meta.title.home");
   const [property, setProperty] = useState<Property | null>(null);
-  const [screen, setScreen] = useState<"bill" | "breakdown">("bill");
+  const [screen, setScreen] = useState<View>("bill");
+  const [notFound, setNotFound] = useState(false);
   const [modal, setModal] = useState<"payment" | "dispute" | null>(null);
   const [disputeLine, setDisputeLine] = useState<DisputeId | undefined>();
   const [disputeKey, setDisputeKey] = useState(0);
-  const [paid, setPaid] = useState(false);
-  const [lastPayment, setLastPayment] = useState<PaymentResult | null>(null);
+  // Simulated payments live in memory for the session, keyed by property id.
+  const [payments, setPayments] = useState<Record<string, PaymentResult>>({});
+  const propertyId = property?.id ?? null;
+  const lastPayment = propertyId ? payments[propertyId] ?? null : null;
+  const paid = lastPayment !== null;
+  const firstRoute = useRef(true);
 
-  function selectProperty(next: Property) { setProperty(next); setScreen("bill"); setPaid(false); setLastPayment(null); setModal(null); }
+  // Read the current URL into screen state (initial load, browser back/forward).
+  const syncFromUrl = useCallback(() => {
+    const route = parseUrl();
+    setProperty(route.property);
+    setScreen(route.view);
+    setNotFound(route.unknownId !== null);
+    setModal(null);
+    return route;
+  }, []);
+
+  useEffect(() => {
+    const route = syncFromUrl();
+    if (route.unknownId !== null) replaceUrl("/");
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, [syncFromUrl]);
+
+  // New screen => start at the top (skipped for the very first render).
+  useEffect(() => {
+    if (firstRoute.current) { firstRoute.current = false; return; }
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [propertyId, screen]);
+
+  const goTo = useCallback((next: Property | null, view: View) => {
+    pushUrl(urlFor(next?.id ?? null, view));
+    setProperty(next);
+    setScreen(view);
+    setNotFound(false);
+    setModal(null);
+  }, []);
+
+  // "Back" / "All properties" / brand: if the previous history entry is exactly the
+  // parent screen, step back to it; otherwise (deep link, or a different path here)
+  // navigate to the parent. Either way no full page reload happens.
+  function goUp(parentProperty: Property | null, parentView: View) {
+    const target = urlFor(parentProperty?.id ?? null, parentView);
+    if (historyMeta()?.from === target) { window.history.back(); return; }
+    if ((historyMeta()?.idx ?? 0) === 0) replaceUrl(target); else pushUrl(target);
+    setProperty(parentProperty);
+    setScreen(parentView);
+    setNotFound(false);
+    setModal(null);
+  }
+
+  function openProperty(next: Property) {
+    // Opening from the landing page starts the demo fresh (no earlier simulated payment).
+    setPayments((current) => { const copy = { ...current }; delete copy[next.id]; return copy; });
+    goTo(next, "bill");
+  }
   function openDispute(line?: DisputeId) { setDisputeLine(line); setDisputeKey((n) => n + 1); setModal("dispute"); }
 
-  if (!property) return <Lookup onChoose={selectProperty} />;
-  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => setScreen("breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={() => window.location.reload()} /> : <Breakdown property={property} onBack={() => setScreen("bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPaid(true); setLastPayment(result); setScreen("bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
+  if (!property) return <Lookup onChoose={openProperty} notFound={notFound} onClearNotFound={() => setNotFound(false)} />;
+  return <div className="app-shell">{screen === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={() => goTo(property, "breakdown")} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={() => goUp(null, "bill")} onHome={() => goUp(null, "bill")} /> : <Breakdown property={property} onBack={() => goUp(property, "bill")} onHome={() => goUp(null, "bill")} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); setPayments((current) => ({ ...current, [property.id]: result })); if (screen === "breakdown") goTo(property, "bill"); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
 }
