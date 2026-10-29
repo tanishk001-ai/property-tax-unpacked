@@ -457,11 +457,15 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
     });
   }
 
+  // Once the receipt is showing the payment has been simulated, so closing it by
+  // any route (X, Escape, backdrop) counts as "Return to bill" and records it.
+  const close = receipt ? () => onPaid(receipt) : onClose;
+
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={close}>
       {receipt ? (
         <div className="modal-content receipt-content">
-          <button className="modal-close" onClick={onClose} type="button" aria-label={t("rcpt.close")}><Icon name="close" /></button>
+          <button className="modal-close" onClick={close} type="button" aria-label={t("rcpt.close")}><Icon name="close" /></button>
           <div className="success-icon"><Icon name="check" /></div>
           <span className="eyebrow"><span className="eyebrow-dot" />{t("rcpt.eyebrow")}</span>
           <h2>{t("rcpt.title", payModeLabel(t, receipt.mode))}</h2>
