@@ -253,4 +253,15 @@ A cropped screenshot of a bill must never pass as a real one, so every headline 
 - **DT-03** The amount stays on one line, the tag does not overlap it and stays inside its panel (auto)
 - **DT-04** The tag text meets WCAG AA contrast (4.5:1) against the tag's own background (auto)
 - **DT-05** The tag is still there in the paid state (auto)
-- **DT-06** A screenshot cropped to the amount panel alone shows the tag (picture saved in `screenshots/demo-tag/`)
+- **DT-06** A screenshot cropped to the amount panel alone shows the tag (picture kept locally)
+
+## 17. Live site checks (run only against the production URL)
+
+- **LV-01** `/bill/<id>` and `/bill/<id>/breakdown` return 200 and show the right amount, all three properties
+- **LV-02** `/?id=DEMO-7719`, `/?id=demo-7719&view=breakdown` and `/bill/demo-7719` redirect once (308) to the canonical path
+- **LV-03** `/bill/NOPE` returns 200 and shows the not-found message
+- **LV-04** A deep link paints the bill with JavaScript off, and under Slow 3G + 6x CPU with no landing-page flash (pictures kept locally)
+- **LV-05** The "Demo data" tag is visible beside the amount on the bill and the breakdown, in both languages, at 390 px
+- **LV-06** Link preview tags: og:title, og:description, og:image (absolute, 200, 1200x630), twitter:card; values printed
+- **LV-07** The Vercel analytics script loads (without sending any data from the test)
+- **LV-08** No console errors on any screen, both languages

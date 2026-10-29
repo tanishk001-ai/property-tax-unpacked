@@ -5,13 +5,14 @@ const base = process.argv[2] || "http://localhost:3102";
 const env = process.argv[3] || "prod-local";
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").replace("--only=", "").split(",").filter(Boolean);
 const out = (process.argv.find((a) => a.startsWith("--out=")) || "").replace("--out=", "") || undefined;
-const SECTIONS = ["routing", "lookup", "bill", "modals", "lang", "layout", "a11y", "robust", "share", "webkit", "demotag"];
+const SECTIONS = ["routing", "lookup", "bill", "modals", "lang", "layout", "a11y", "robust", "share", "webkit", "demotag", "live"];
 
 (async () => {
   const rec = createRecorder(env, out);
   const browser = await pw.chromium.launch();
   for (const name of SECTIONS) {
     if (only.length && !only.includes(name)) continue;
+    if (name === "live" && !/^https:/.test(base) && !only.includes("live")) continue; // live-only checks
     console.log(`\n=== ${name} (${env}: ${base}) ===`);
     try { await require(`./sections/${name}.cjs`)({ browser, base, env, rec }); }
     catch (e) { console.log(`ERROR in section ${name}: ${e.stack || e}`); await rec.ok(`SUITE-${name}`, false, String(e.stack || e)); }

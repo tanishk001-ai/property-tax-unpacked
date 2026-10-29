@@ -1,45 +1,50 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { canonicalId } from "./app/properties";
 
-// Two jobs, both off the fast path (the three prerendered bills never reach this):
+// Runs for every /bill/... address and for old /?id= links:
 //
 // 1. Links from before bills had real routes: /?id=DEMO-7719[&view=breakdown]
 //    redirect to /bill/DEMO-7719[/breakdown].
-// 2. /bill/<something else>: a different spelling of a real id (demo-7719) redirects
-//    to the canonical path; anything unknown is rewritten, keeping the URL, to the
-//    landing page with the "not found" message. That is status 200, not a 404, and
-//    it never creates a cached page per probed id.
+// 2. /bill/<id>[/breakdown]: the exact canonical address passes straight through to
+//    the prerendered page. Another spelling of a real id (demo-7719, a trailing
+//    slash, a stray space) redirects once to the canonical address. An unknown id is
+//    rewritten, keeping the URL, to the landing page with the "not found" message:
+//    status 200, not a 404, and no cached page per probed id.
+//
+// The matcher takes every /bill/... address on purpose. Matching "everything except
+// the three canonical ids" worked under `next start` but not on Vercel, where path
+// matching ignores case, so /bill/demo-7719 was excluded from the middleware and
+// returned 404, and a trailing slash made it redirect to itself.
 export function middleware(request: NextRequest) {
-  const url = request.nextUrl.clone();
+  const { pathname, search, searchParams } = request.nextUrl;
+  const to = (path: string, query = search) => NextResponse.redirect(new URL(path + query, request.url), 308);
 
-  if (url.pathname === "/") {
-    const raw = (url.searchParams.get("id") ?? "").trim();
+  if (pathname === "/") {
+    const raw = (searchParams.get("id") ?? "").trim();
     if (!raw) return NextResponse.next();
-    const breakdown = url.searchParams.get("view") === "breakdown";
-    url.searchParams.delete("id");
-    url.searchParams.delete("view");
+    const rest = new URLSearchParams(searchParams);
+    rest.delete("id");
+    rest.delete("view");
+    const query = rest.size ? `?${rest}` : "";
     // The id is encoded so it can only ever be one path segment.
-    url.pathname = `/bill/${encodeURIComponent(canonicalId(raw) ?? raw)}${breakdown ? "/breakdown" : ""}`;
-    return NextResponse.redirect(url, 308);
+    return to(`/bill/${encodeURIComponent(canonicalId(raw) ?? raw)}${searchParams.get("view") === "breakdown" ? "/breakdown" : ""}`, query);
   }
 
-  const match = /^\/bill\/([^/]+)(\/breakdown)?\/?$/.exec(url.pathname);
-  if (!match) return NextResponse.next();
+  if (/^\/bill\/*$/.test(pathname)) return to("/", "");
+
+  const match = /^\/bill\/([^/]+)(\/breakdown)?\/*$/.exec(pathname);
+  if (!match) return NextResponse.next(); // e.g. /bill/DEMO-7719/extra: the not-found page
+  const suffix = match[2] ?? "";
   const id = canonicalId(match[1]);
-  if (id) {
-    url.pathname = `/bill/${id}${match[2] ?? ""}`;
-    return NextResponse.redirect(url, 308);
-  }
+  if (id) return pathname === `/bill/${id}${suffix}` ? NextResponse.next() : to(`/bill/${id}${suffix}`);
+  const url = request.nextUrl.clone();
   url.pathname = "/bill/unknown";
   return NextResponse.rewrite(url);
 }
 
-// Keep this list of ids in step with app/data/properties.json: the matcher has to
-// be a literal, so it cannot be built from the data. A missing id would only mean
-// that bill is routed through the middleware (still correct, just not instant).
 export const config = {
   matcher: [
     { source: "/", has: [{ type: "query", key: "id" }] },
-    "/bill/((?!(?:DEMO-2048|DEMO-7719|DEMO-3982)(?:/breakdown)?$).+)",
+    "/bill/:path*",
   ],
 };

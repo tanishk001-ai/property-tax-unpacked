@@ -39,7 +39,7 @@ module.exports = async function share({ browser, base, env, rec }) {
   // SH-03 the image answers and is the right size (fetched from this environment's origin)
   for (const url of images) {
     let pathOnly; try { pathOnly = new URL(url).pathname; } catch { ok("SH-03", false, "bad image url " + url); continue; }
-    const res = await new Promise((resolve) => { const http = require("http"); const u = new URL(base); http.get({ host: u.hostname, port: u.port, path: pathOnly }, (r) => { const c = []; r.on("data", (d) => c.push(d)); r.on("end", () => resolve({ status: r.statusCode, type: r.headers["content-type"], buf: Buffer.concat(c) })); }).on("error", () => resolve({ status: 0 })); });
+    const r0 = await rawGet(base, pathOnly + (new URL(url).search || "")); const res = { status: r0.status, type: r0.headers["content-type"], buf: r0.buf };
     const size = res.buf && pngSize(res.buf);
     ok("SH-03", res.status === 200 && /^image\//.test(res.type || "") && size && size.w >= 1200 && size.h >= 600 && Math.abs(size.w / size.h - 1.91) < 0.05 && res.buf.length < 600000, `${url}: status ${res.status} type ${res.type} size ${JSON.stringify(size)} bytes ${res.buf && res.buf.length}`);
   }

@@ -10,7 +10,7 @@ for (const line of plan.split("\n")) {
   const m = line.match(/^- \*\*([A-Z]{2}-\d{2})\*\* (.+)$/); if (m) cases.push({ id: m[1], feature, text: m[2].replace(/\s*\((auto|manual)[^)]*\)\s*$/i, "") });
 }
 const load = (f) => { try { return JSON.parse(fs.readFileSync(path.join(__dirname, "results", f), "utf8")).results; } catch { return null; } };
-const cols = [["Before fixes (prod build)", "prod-local-baseline.json"], ["After fixes (prod build)", "prod-local.json"], ["After fixes (dev, strict mode)", "dev.json"], ["Vercel preview", "preview.json"]];
+const cols = [["Before fixes (prod build)", "prod-local-baseline.json"], ["After fixes (prod build)", "prod-local.json"], ["After fixes (dev, strict mode)", "dev.json"], ["Vercel preview", "preview.json"], ["Live site (after merge)", "live.json"]];
 const data = cols.map(([, f]) => load(f));
 const manual = (() => { try { return JSON.parse(fs.readFileSync(path.join(__dirname, "manual-results.json"), "utf8")); } catch { return {}; } })();
 const cell = (r) => (!r ? "·" : r.pass ? "✅" : "❌");
