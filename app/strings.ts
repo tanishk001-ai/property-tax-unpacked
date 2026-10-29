@@ -65,6 +65,8 @@ export const STR = {
   "meta.title.home": { en: "Unpacked · Property bill explainer", hi: "Unpacked · संपत्ति बिल की व्याख्या" },
   "meta.title.terms": { en: "Terms · Unpacked", hi: "शर्तें · Unpacked" },
   "meta.title.faq": { en: "Common questions · Unpacked", hi: "सामान्य प्रश्न · Unpacked" },
+  "meta.title.bill": { en: (id) => `${id} · Your bill · Unpacked`, hi: (id) => `${id} · आपका बिल · Unpacked` },
+  "meta.title.breakdown": { en: (id) => `${id} · Why this amount? · Unpacked`, hi: (id) => `${id} · यह राशि क्यों? · Unpacked` },
   "meta.title.notfound": { en: "Page not found · Unpacked", hi: "पेज नहीं मिला · Unpacked" },
   "nf.title": { en: "This page doesn’t exist.", hi: "यह पेज मौजूद नहीं है।" },
   "nf.body": { en: "The link may be mistyped. Open one of the demo bills from the home page.", hi: "लिंक में कोई गलती हो सकती है। मुख्य पेज से कोई डेमो बिल खोलें।" },

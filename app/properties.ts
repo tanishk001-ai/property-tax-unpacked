@@ -10,3 +10,7 @@ export function canonicalId(raw: string): string | null {
   const wanted = decoded.trim().toLowerCase();
   return propertyIds.find((id) => id.toLowerCase() === wanted) ?? null;
 }
+
+export function propertyLabel(id: string): string {
+  return fixtures.find((property) => property.id === id)?.label ?? id;
+}

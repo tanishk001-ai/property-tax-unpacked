@@ -51,10 +51,10 @@ export function useI18n() {
 }
 
 // Sets the browser tab title in the active language.
-export function useDocumentTitle(key: StrKey) {
+export function useDocumentTitle(key: StrKey, ...args: (string | number)[]) {
   const { t } = useI18n();
+  const title = t(key, ...args);
   useEffect(() => {
-    const title = t(key);
     const apply = () => {
       if (document.title !== title) document.title = title;
     };
@@ -64,7 +64,7 @@ export function useDocumentTitle(key: StrKey) {
     const observer = new MutationObserver(apply);
     observer.observe(document.head, { childList: true, characterData: true, subtree: true });
     return () => observer.disconnect();
-  }, [t, key]);
+  }, [title]);
 }
 
 export function LangToggle({ compact = false }: { compact?: boolean }) {

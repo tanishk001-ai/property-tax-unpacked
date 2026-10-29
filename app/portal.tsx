@@ -608,7 +608,7 @@ export function Landing({ notFound = false }: { notFound?: boolean }) {
 }
 
 export function BillScreen({ id, view }: { id: string; view: View }) {
-  useDocumentTitle("meta.title.home");
+  useDocumentTitle(view === "bill" ? "meta.title.bill" : "meta.title.breakdown", id);
   const router = useRouter();
   const session = useSession();
   const { takeNextSource, consumeEntry } = session;
