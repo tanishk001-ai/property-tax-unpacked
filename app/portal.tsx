@@ -544,11 +544,30 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
   );
 }
 
+// Copies text and says whether it worked: the async clipboard API where it exists, the old
+// execCommand route otherwise (some in-app browsers, non-secure contexts), false if neither.
+async function copyText(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(value); return true; }
+  } catch { /* fall through to the legacy route */ }
+  try {
+    const box = document.createElement("textarea");
+    box.value = value;
+    box.setAttribute("readonly", "");
+    box.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(box);
+    box.select();
+    const done = document.execCommand("copy");
+    document.body.removeChild(box);
+    return done;
+  } catch { return false; }
+}
+
 function DisputeModal({ property, initialLine, resetKey, onClose }: { property: Property; initialLine?: DisputeId; resetKey: number; onClose: () => void }) {
   const { t, lang } = useI18n();
   const [lineId, setLineId] = useState<DisputeId>(initialLine ?? "annual-tax");
   const [submitted, setSubmitted] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"yes" | "no" | null>(null);
   const [reference, setReference] = useState("");
   // What the visitor has typed in the "what should be checked" box; null means they have
   // not edited it, so it keeps following the generated text (and the language / line).
@@ -558,13 +577,13 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
     setSeenReset(resetKey);
     setLineId(initialLine ?? "annual-tax");
     setSubmitted(false);
-    setCopied(false);
+    setCopied(null);
     setReference("");
     setDraft(null);
   }
   const lineLabel = disputeLabel(t, lang, property, lineId);
   const reason = t("disp.reason", lineLabel, property.id);
-  return <Modal onClose={onClose} label={submitted ? t("disp.recorded") : t("action.raiseDispute")} focusKey={submitted ? "done" : "form"}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); trackEvent("dispute_submitted", { id: property.id, line: lineId }); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" value={draft ?? reason} onChange={(event) => setDraft(event.target.value)} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
+  return <Modal onClose={onClose} label={submitted ? t("disp.recorded") : t("action.raiseDispute")} focusKey={submitted ? "done" : "form"}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={async () => setCopied((await copyText(reference)) ? "yes" : "no")} type="button"><Icon name="copy" />{copied === "yes" ? t("disp.copied") : t("disp.copy")}</button>{copied === "no" && <small role="status" className="copy-failed">{t("disp.copyFailed")}</small>}</div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); trackEvent("dispute_submitted", { id: property.id, line: lineId }); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" value={draft ?? reason} onChange={(event) => setDraft(event.target.value)} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
 }
 
 // The landing page. With `notFound` set it is what /bill/<unknown id> renders:

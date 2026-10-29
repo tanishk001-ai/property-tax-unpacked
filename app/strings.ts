@@ -398,6 +398,7 @@ export const STR = {
   "disp.referenceNumber": { en: "Reference number", hi: "संदर्भ संख्या" },
   "disp.copy": { en: "Copy", hi: "कॉपी करें" },
   "disp.copied": { en: "Copied", hi: "कॉपी हुआ" },
+  "disp.copyFailed": { en: "Couldn’t copy. Select the number and copy it.", hi: "कॉपी नहीं हो सका। नंबर चुनकर कॉपी करें।" },
   "disp.within2": { en: "Within 2 working days", hi: "2 कार्य दिवसों में" },
   "disp.within2Body": {
     en: "A record-check team reviews the property detail and rule.",
