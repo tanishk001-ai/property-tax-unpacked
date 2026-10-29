@@ -2,11 +2,14 @@
 // PLAYWRIGHT_PATH at an installed copy (or have `playwright` resolvable).
 const fs = require("fs");
 const http = require("http");
+const https = require("https");
 const path = require("path");
 const pw = require(process.env.PLAYWRIGHT_PATH || "playwright");
 
 const RESULTS_DIR = path.join(__dirname, "results");
 const SHOT_DIR = path.join(__dirname, "screenshots");
+// the analytics script is /_vercel/insights/script.js in dev and /<hash>/script.js on Vercel
+const ANALYTICS_URL = /va\.vercel-scripts\.com|_vercel\/insights|\/[0-9a-f]{12,}\/(script\.js|view|event|session)/;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function createRecorder(envName, outFile) {
@@ -39,7 +42,7 @@ function createRecorder(envName, outFile) {
 // A browser page with the problems we care about collected on page.problems and
 // analytics calls captured on window.__va (unless captureVa is false).
 async function openPage(browser, opts = {}) {
-  const { width = 1366, height = 768, lang = "en", js = true, blockStorage = false, colorScheme, reducedMotion, mobile = width <= 768, blockAnalytics = false, captureVa = true, clipboard } = opts;
+  const { width = 1366, height = 768, lang = "en", js = true, blockStorage = false, colorScheme, reducedMotion, mobile = width <= 768, blockAnalytics = false, captureVa = true, clipboard, realAnalytics = false } = opts;
   const ctx = await browser.newContext({
     viewport: { width, height },
     javaScriptEnabled: js,
@@ -67,8 +70,9 @@ async function openPage(browser, opts = {}) {
       }
     }, { l: lang, blockStorage, captureVa, clip: clipboard });
   }
-  if (blockAnalytics) await ctx.route(/va\.vercel-scripts\.com|_vercel\/insights/, (r) => r.abort("blockedbyclient"));
-  else await ctx.route(/va\.vercel-scripts\.com|_vercel\/insights/, (r) => r.fulfill({ status: 200, contentType: "application/javascript", body: "" }));
+  if (realAnalytics) { /* let the real analytics script load */ }
+  else if (blockAnalytics) await ctx.route(ANALYTICS_URL, (r) => r.abort("blockedbyclient"));
+  else await ctx.route(ANALYTICS_URL, (r) => r.fulfill({ status: 200, contentType: "application/javascript", body: "" }));
   const page = await ctx.newPage();
   const problems = [];
   page.on("pageerror", (e) => problems.push("pageerror: " + e.message));
@@ -88,11 +92,12 @@ async function openPage(browser, opts = {}) {
 // Raw HTTP GET that sends the path exactly as given (fetch() would normalise %2e%2e).
 function rawGet(base, rawPath, headers = {}) {
   const u = new URL(base);
+  const lib = u.protocol === "https:" ? https : http;
   return new Promise((resolve, reject) => {
-    const req = http.request({ host: u.hostname, port: u.port, path: rawPath, method: "GET", headers: { "user-agent": "qa-suite", accept: "text/html", ...headers } }, (res) => {
+    const req = lib.request({ host: u.hostname, port: u.port || undefined, path: rawPath, method: "GET", headers: { "user-agent": "qa-suite", accept: "text/html", ...headers } }, (res) => {
       const chunks = [];
       res.on("data", (c) => chunks.push(c));
-      res.on("end", () => resolve({ status: res.statusCode, location: res.headers.location, headers: res.headers, body: Buffer.concat(chunks).toString("utf8") }));
+      res.on("end", () => { const buf = Buffer.concat(chunks); resolve({ status: res.statusCode, location: res.headers.location, headers: res.headers, body: buf.toString("utf8"), buf }); });
     });
     req.on("error", reject);
     req.setTimeout(20000, () => req.destroy(new Error("timeout")));
@@ -116,4 +121,4 @@ const text = async (page, sel) => (await page.locator(sel).first().textContent()
 const rupeeTokens = (s) => (s.match(/₹\s?[\d,]+(?:\.\d+)?/g) || []).map((x) => Number(x.replace(/[₹\s,]/g, "")));
 const eventsOf = (page) => page.evaluate(() => (window.__va || []).filter((e) => e[0] === "event").map((e) => ({ name: e[1].name, data: e[1].data })));
 
-module.exports = { pw, sleep, createRecorder, openPage, rawGet, followChain, text, rupeeTokens, eventsOf, RESULTS_DIR, SHOT_DIR };
+module.exports = { ANALYTICS_URL, pw, sleep, createRecorder, openPage, rawGet, followChain, text, rupeeTokens, eventsOf, RESULTS_DIR, SHOT_DIR };
