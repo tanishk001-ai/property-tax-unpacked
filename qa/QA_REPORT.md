@@ -1,6 +1,6 @@
 # QA report: Unpacked (PR #1, branch `polish-before-launch`)
 
-Tested as someone who did not build the app and does not trust it. Plan: [TEST_PLAN.md](TEST_PLAN.md). Suite: `qa/suite.cjs` (headless Chromium and WebKit via Playwright). Raw results: `qa/results/`. Before/after pictures of the main bugs: `qa/screenshots/before/` and `qa/screenshots/after/`; what a link-preview crawler sees: `qa/evidence/`.
+Tested as someone who did not build the app and does not trust it. Plan: [TEST_PLAN.md](TEST_PLAN.md). Suite: `qa/suite.cjs` (headless Chromium and WebKit via Playwright). Raw results: `qa/results/`. Before/after pictures and link-preview evidence: screenshots kept locally (not in the repo).
 
 ## Verdict
 
@@ -31,7 +31,7 @@ Severity: **blocker** stops the post, **major** a recruiter could plausibly hit 
 | BUG-03 | major | After paying, the breakdown's bottom bar still offered "Pay bill", so the same bill could be paid twice and the two screens disagreed. | PY-09 | `7376bba` |
 | BUG-04 | major | The terms said "no real data is collected, stored, or transmitted". The site counts anonymous usage with Vercel Web Analytics and remembers the language in the browser. Untrue as written. | FQ-04 (read-through) | `6d51b92` |
 | BUG-05 | major | Dialogs were not accessible: no accessible name (axe `aria-dialog-name`, serious, on all four dialogs in both languages), Escape did nothing, focus did not move into the dialog or back to the button that opened it, and Tab walked out into the page behind. | AX-03, AX-04, AX-06, DP-09, DP-11 | `9c1a44b` |
-| BUG-06 | major | Nothing for a link preview: no Open Graph or Twitter tags, no preview image, no favicon (`/favicon.ico` was a 404). A LinkedIn post would have shown a bare URL. See `qa/evidence/head-of-bill-page-before.html` and `-after.html`. | SH-02, SH-03, SH-06 | `46f5cbf` |
+| BUG-06 | major | Nothing for a link preview: no Open Graph or Twitter tags, no preview image, no favicon (`/favicon.ico` was a 404). A LinkedIn post would have shown a bare URL. Evidence (the page head before and after) kept locally. | SH-02, SH-03, SH-06 | `46f5cbf` |
 | BUG-07 | minor | Text typed in the dispute box was thrown away when the language was switched (or the line changed). | DP-06 | `0293766` |
 | BUG-08 | minor | Copy button always said "Copied", even when the clipboard API was missing or refused; a refusal also surfaced as an unhandled error. | DP-08 | `4653d1c` |
 | BUG-09 | minor | An address that is not a page (for example `/bill/DEMO-7719/extra`) showed the framework's English-only 404 with no way back, in Hindi too. | RT-19, LG-06 | `299cb1a` |
@@ -50,7 +50,7 @@ Severity: **blocker** stops the post, **major** a recruiter could plausibly hit 
 Each fix is its own commit on the branch (`git log --oneline d123de6..HEAD`). After the fixes the whole suite was re-run (table above) and the failing cases from the first run were re-checked individually; the "Before fixes" and "After fixes" columns in the table below show the change per case.
 
 - **Wrong numbers: none found.** Every rupee amount for all three properties (area value, each factor step, annual tax, each rebate, the unclaimed saving, the penalty, the amount due, the history rows) matches `qa/expected.cjs`, which recomputes them with exact fractions (BigInt, round half up) straight from `properties.json`, not from the app's own `calc()`. Checked on the bill, the breakdown, the banners, the receipt and the paid state, in English and Hindi, with Indian digit grouping everywhere (cases BL-01..11, BD-01..08, NM-01..04). The lines add up exactly on screen (tax − rebates + penalty = amount due, no off-by-one).
-- **BUG-01..03, 07, 08, 16**: re-ran LK-16, PY-05/06/07/09, DP-06/08 and AX-03 after each fix; all pass in the production build and the dev server. Before/after pictures: `qa/screenshots/before/` and `qa/screenshots/after/` (landing without JavaScript, bill after closing the receipt with X, breakdown after paying, dispute note after toggling the language, not-found page in English and Hindi).
+- **BUG-01..03, 07, 08, 16**: re-ran LK-16, PY-05/06/07/09, DP-06/08 and AX-03 after each fix; all pass in the production build and the dev server. Before/after pictures (screenshots kept locally) (landing without JavaScript, bill after closing the receipt with X, breakdown after paying, dispute note after toggling the language, not-found page in English and Hindi).
 - **BUG-05**: after the fix, axe-core finds no serious or critical violation on any screen or dialog in either language (AX-06), Tab stays in each dialog, Escape closes it and focus returns to the opener (AX-03/04). A keyboard-only run from the landing page through payment now completes (AX-01).
 - **BUG-06, 10**: `og:title`, `og:description`, `og:image`, `twitter:card` and `twitter:image` exist on every page; the image is a 1200×630 PNG (SH-02/03); a favicon is served (SH-06); titles differ per screen and are translated (SH-01).
 - **BUG-12**: no URL in the 41-URL redirect set takes more than one hop (RT-16: max 1).
@@ -83,7 +83,7 @@ These are not bugs in the code; I did not change them.
 
 ## Addendum: "Demo data" tag
 
-Added after the first pass so a cropped screenshot of a bill cannot pass as a real one: a "Demo data" / "डेमो डेटा" tag sits on the same line as the amount in the bill summary and in the breakdown header (cases DT-01..06, run at 320, 390 and 1366 px in both languages, all three properties, including the paid state). It stays on one line with the amount, never overlaps it, stays inside its panel, and measures well above AA contrast (dark brown on amber, about 9:1). Running the layout checks again found one real problem the tag introduced: at a 683 px wide window (200% zoom of a laptop) the breakdown header overflowed by 7 px; fixed in the same commit. The layout, Hindi-leftover, contrast and number checks were re-run and pass. Pictures: `qa/screenshots/demo-tag/`.
+Added after the first pass so a cropped screenshot of a bill cannot pass as a real one: a "Demo data" / "डेमो डेटा" tag sits on the same line as the amount in the bill summary and in the breakdown header (cases DT-01..06, run at 320, 390 and 1366 px in both languages, all three properties, including the paid state). It stays on one line with the amount, never overlaps it, stays inside its panel, and measures well above AA contrast (dark brown on amber, about 9:1). Running the layout checks again found one real problem the tag introduced: at a 683 px wide window (200% zoom of a laptop) the breakdown header overflowed by 7 px; fixed in the same commit. The layout, Hindi-leftover, contrast and number checks were re-run and pass. Pictures: screenshots kept locally.
 
 ## Addendum: live site after merging PR #1
 
@@ -94,7 +94,7 @@ Run against `https://property-tax-unpacked.vercel.app` (every result below is **
 
 Cause: the middleware matcher excluded the three canonical ids with a negative lookahead. `next start` compares that pattern case-sensitively; Vercel does not, so lowercase ids were excluded from the middleware and fell through to a 404, and a trailing slash survived into the redirect target. Fixed in the branch `fix/live-routing` (the matcher takes every `/bill/...` address and the middleware decides), checked locally against the same URL list: 19 of 19 routing cases pass. Not yet verified on Vercel itself.
 
-Everything else passed live: the six bill and breakdown addresses with the right amounts, the old `?id=` redirects (one 308 each), `/bill/NOPE` (200 with the not-found message), first paint with JavaScript off and under Slow 3G plus 6x CPU with no landing-page flash, the "Demo data" tag in both languages at 390 px, link-preview tags and a 1200x630 image, no console errors on any screen, and the analytics script (served from a first-party path, `/<hash>/script.js`, HTTP 200). Pictures: `qa/screenshots/live/`. Analytics beacons could not be confirmed: the script sends none from a headless browser, so check the Vercel dashboard by hand.
+Everything else passed live: the six bill and breakdown addresses with the right amounts, the old `?id=` redirects (one 308 each), `/bill/NOPE` (200 with the not-found message), first paint with JavaScript off and under Slow 3G plus 6x CPU with no landing-page flash, the "Demo data" tag in both languages at 390 px, link-preview tags and a 1200x630 image, no console errors on any screen, and the analytics script (served from a first-party path, `/<hash>/script.js`, HTTP 200). Pictures: screenshots kept locally. Analytics beacons could not be confirmed: the script sends none from a headless browser, so check the Vercel dashboard by hand.
 
 ## Test mistakes I made and corrected
 
@@ -255,11 +255,11 @@ The first runs reported some failures that were my test's fault, not the app's. 
 | DT-03 | The amount stays on one line, the tag does not overlap it and stays inside its panel | · | ✅ | · | · | ✅ |  |
 | DT-04 | The tag text meets WCAG AA contrast (4.5:1) against the tag's own background | · | ✅ | · | · | ✅ |  |
 | DT-05 | The tag is still there in the paid state | · | ✅ | · | · | ✅ |  |
-| DT-06 | A screenshot cropped to the amount panel alone shows the tag (picture saved in `screenshots/demo-tag/`) | · | ✅ | · | · | ✅ |  |
+| DT-06 | A screenshot cropped to the amount panel alone shows the tag (picture kept locally) | · | ✅ | · | · | ✅ |  |
 | LV-01 | `/bill/<id>` and `/bill/<id>/breakdown` return 200 and show the right amount, all three properties | · | · | · | · | ✅ |  |
 | LV-02 | `/?id=DEMO-7719`, `/?id=demo-7719&view=breakdown` and `/bill/demo-7719` redirect once (308) to the canonical path | · | · | · | · | ❌ |  |
 | LV-03 | `/bill/NOPE` returns 200 and shows the not-found message | · | · | · | · | ✅ |  |
-| LV-04 | A deep link paints the bill with JavaScript off, and under Slow 3G + 6x CPU with no landing-page flash (pictures in `screenshots/live/`) | · | · | · | · | ✅ |  |
+| LV-04 | A deep link paints the bill with JavaScript off, and under Slow 3G + 6x CPU with no landing-page flash (pictures kept locally) | · | · | · | · | ✅ |  |
 | LV-05 | The "Demo data" tag is visible beside the amount on the bill and the breakdown, in both languages, at 390 px | · | · | · | · | ✅ |  |
 | LV-06 | Link preview tags: og:title, og:description, og:image (absolute, 200, 1200x630), twitter:card; values printed | · | · | · | · | ✅ |  |
 | LV-07 | The Vercel analytics script loads (without sending any data from the test) | · | · | · | · | ✅ |  |

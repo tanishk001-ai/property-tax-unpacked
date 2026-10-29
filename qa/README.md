@@ -15,5 +15,5 @@ node qa/report.cjs                                          # pass/fail table fr
 - `QA_REPORT.md`: results, bugs, fixes, product decisions.
 - `expected.cjs`: independent expected amounts (exact fractions, from `properties.json`).
 - `sections/*.cjs`: the cases, one file per area. `lib.cjs`: helpers.
-- `evidence.cjs`: the before/after pictures in `screenshots/`.
+- `evidence.cjs`: makes the before/after pictures. Screenshots and `evidence/` are kept locally and git-ignored.
 - `results/`: JSON results (`prod-local-baseline` is the build before the fixes).

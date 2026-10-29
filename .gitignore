@@ -22,3 +22,7 @@ yarn-error.log*
 
 # env
 .env*.local
+
+# QA pictures and evidence stay on the machine that made them
+qa/screenshots/
+qa/evidence/
