@@ -59,10 +59,13 @@ export function useDocumentTitle(key: StrKey, ...args: (string | number)[]) {
       if (document.title !== title) document.title = title;
     };
     apply();
-    // Next re-renders its own <title> from the layout metadata after hydration,
-    // which would put the English title back; re-apply when that happens.
-    const observer = new MutationObserver(apply);
-    observer.observe(document.head, { childList: true, characterData: true, subtree: true });
+    // Next re-renders its own <title> from the layout metadata after hydration, which
+    // would put the English title back. In production it sits in <head>; the dev server
+    // streams it into <body>, so watch the whole document for changes to a <title>.
+    const touchesTitle = (r: MutationRecord) =>
+      r.target.nodeName === "TITLE" || r.target.parentNode?.nodeName === "TITLE" || Array.from(r.addedNodes).some((n) => n.nodeName === "TITLE");
+    const observer = new MutationObserver((records) => { if (records.some(touchesTitle)) apply(); });
+    observer.observe(document.documentElement, { childList: true, characterData: true, subtree: true });
     return () => observer.disconnect();
   }, [title]);
 }
