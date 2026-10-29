@@ -31,10 +31,32 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [payments, setPayments] = useState<Record<string, PaymentResult>>({});
   const nextSource = useRef<OpenSource | null>(null);
   const entryPending = useRef(true);
-  const trail = useRef<{ current: string; previous: string | null }>({ current: pathname, previous: null });
+  // The pages visited in this tab and where we are in that list, so "Back" can tell
+  // whether the entry behind us really is the parent screen. popstate marks a move
+  // through history (browser buttons, router.back) as opposed to a new navigation.
+  const trail = useRef<{ stack: string[]; pos: number; popping: boolean }>({ stack: [pathname], pos: 0, popping: false });
 
   useEffect(() => {
-    if (trail.current.current !== pathname) trail.current = { current: pathname, previous: trail.current.current };
+    const onPop = () => {
+      trail.current.popping = true;
+      window.setTimeout(() => { trail.current.popping = false; }, 1000);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  useEffect(() => {
+    const t = trail.current;
+    if (t.stack[t.pos] === pathname) return;
+    if (t.popping) {
+      t.popping = false;
+      if (t.stack[t.pos - 1] === pathname) t.pos -= 1;
+      else if (t.stack[t.pos + 1] === pathname) t.pos += 1;
+      else { t.stack = [pathname]; t.pos = 0; }
+    } else {
+      t.stack = t.stack.slice(0, t.pos + 1).concat(pathname);
+      t.pos += 1;
+    }
   }, [pathname]);
 
   const setPayment = useCallback((id: string, result: PaymentResult) => setPayments((current) => ({ ...current, [id]: result })), []);
@@ -48,7 +70,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const takeNextSource = useCallback(() => { const source = nextSource.current; nextSource.current = null; return source; }, []);
   const consumeEntry = useCallback(() => { const first = entryPending.current; entryPending.current = false; return first; }, []);
   const goUp = useCallback((parent: string) => {
-    if (trail.current.previous === parent) router.back();
+    if (trail.current.stack[trail.current.pos - 1] === parent) router.back();
     else router.push(parent);
   }, [router]);
 
