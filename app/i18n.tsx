@@ -79,7 +79,7 @@ export function LangToggle({ compact = false }: { compact?: boolean }) {
       <button type="button" className={lang === "en" ? "is-active" : ""} aria-pressed={lang === "en"} onClick={() => choose("en")}>
         EN
       </button>
-      <button type="button" className={lang === "hi" ? "is-active" : ""} aria-pressed={lang === "hi"} onClick={() => choose("hi")}>
+      <button type="button" lang="hi" className={lang === "hi" ? "is-active" : ""} aria-pressed={lang === "hi"} onClick={() => choose("hi")}>
         हिं
       </button>
     </div>
