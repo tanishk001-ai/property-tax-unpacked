@@ -164,6 +164,7 @@ export const STR = {
   },
   "bill.title": { en: (fy) => `Your ${fy} property tax bill`, hi: (fy) => `आपका ${fy} संपत्ति कर बिल` },
   "bill.amountDue": { en: "Amount due", hi: "देय राशि" },
+  "demo.tag": { en: "Demo data", hi: "डेमो डेटा" },
   "bill.paidSimulated": { en: "Paid (simulated)", hi: "भुगतान (सिम्युलेटेड)" },
   "bill.noRealPayment": { en: "No real payment was processed.", hi: "कोई वास्तविक भुगतान नहीं हुआ।" },
   "bill.simulatedVia": { en: (m) => `Simulated via ${m} · `, hi: (m) => `${m} के ज़रिए सिम्युलेटेड · ` },

@@ -243,3 +243,14 @@ Chromium is not what an iPhone runs. Playwright's WebKit with the iPhone 13 prof
 - **WK-01** Landing and the three deep links render with no console errors in WebKit on an iPhone profile (auto)
 - **WK-02** Full journey in WebKit: sample card → breakdown → expand → question → dispute → pay → receipt → paid, then Hindi (auto)
 - **WK-03** No horizontal overflow and the bottom bar clears the content on the bill and breakdown in WebKit, English and Hindi (auto)
+
+## 16. "Demo data" tag (added with the tag)
+
+A cropped screenshot of a bill must never pass as a real one, so every headline amount carries a tag.
+
+- **DT-01** Bill summary: the tag sits next to the amount, same line, reading "Demo data" / "डेमो डेटा", from the dictionary (auto, 320 and 1366 px, both languages, all three properties)
+- **DT-02** Breakdown header: the same (auto)
+- **DT-03** The amount stays on one line, the tag does not overlap it and stays inside its panel (auto)
+- **DT-04** The tag text meets WCAG AA contrast (4.5:1) against the tag's own background (auto)
+- **DT-05** The tag is still there in the paid state (auto)
+- **DT-06** A screenshot cropped to the amount panel alone shows the tag (picture saved in `screenshots/demo-tag/`)

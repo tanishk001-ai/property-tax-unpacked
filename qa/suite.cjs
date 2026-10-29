@@ -5,7 +5,7 @@ const base = process.argv[2] || "http://localhost:3102";
 const env = process.argv[3] || "prod-local";
 const only = (process.argv.find((a) => a.startsWith("--only=")) || "").replace("--only=", "").split(",").filter(Boolean);
 const out = (process.argv.find((a) => a.startsWith("--out=")) || "").replace("--out=", "") || undefined;
-const SECTIONS = ["routing", "lookup", "bill", "modals", "lang", "layout", "a11y", "robust", "share", "webkit"];
+const SECTIONS = ["routing", "lookup", "bill", "modals", "lang", "layout", "a11y", "robust", "share", "webkit", "demotag"];
 
 (async () => {
   const rec = createRecorder(env, out);

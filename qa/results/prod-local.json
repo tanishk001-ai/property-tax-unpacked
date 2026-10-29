@@ -384,7 +384,7 @@
   "RB-03": {
    "pass": true,
    "details": [],
-   "checks": 20
+   "checks": 23
   },
   "PY-01": {
    "pass": true,
@@ -564,7 +564,7 @@
    "details": [],
    "checks": 1,
    "notes": [
-    "Hindi reader, deep link: English headline first visible at 8ms, Hindi at 73ms (fast local connection)"
+    "Hindi reader, deep link: English headline first visible at 7ms, Hindi at 74ms (fast local connection)"
    ]
   },
   "LG-07": {
@@ -637,7 +637,7 @@
    "details": [],
    "checks": 9,
    "notes": [
-    "landing tab order: button.is-active \"EN\" → button. \"हिं\" → input. \"e.g. DEMO-7719\" → button.button \"View bill →\" → button.text-button \"Try a sample property \" → a.sample-card \"01A clear, paid-on-tim\" → a.sample-card \"02A bill with a missed\" → a.sample-card \"03An overdue bill with\" → a.prototype-note-link \"Full terms\" → a.prototype-note-link \"FAQ\" → body. \"UnpackedProperty bill,\" → button.is-active \"EN\" → button. \"हिं\" → input. \"e.g. DEMO-7719\""
+    "landing tab order: button.is-active \"EN\" \u2192 button. \"\u0939\u093f\u0902\" \u2192 input. \"e.g. DEMO-7719\" \u2192 button.button \"View bill \u2192\" \u2192 button.text-button \"Try a sample property \" \u2192 a.sample-card \"01A clear, paid-on-tim\" \u2192 a.sample-card \"02A bill with a missed\" \u2192 a.sample-card \"03An overdue bill with\" \u2192 a.prototype-note-link \"Full terms\" \u2192 a.prototype-note-link \"FAQ\" \u2192 body. \"UnpackedProperty bill,\" \u2192 button.is-active \"EN\" \u2192 button. \"\u0939\u093f\u0902\" \u2192 input. \"e.g. DEMO-7719\""
    ]
   },
   "AX-02": {
@@ -691,7 +691,7 @@
    "details": [],
    "checks": 24,
    "notes": [
-    "first contentful paint under Slow 3G + 6× CPU (all six deep links): 1724, 2324, 1988, 2292, 1776, 1828 ms"
+    "first contentful paint under Slow 3G + 6\u00d7 CPU (all six deep links): 1724, 2324, 1988, 2292, 1776, 1828 ms"
    ]
   },
   "RB-04": {
@@ -707,8 +707,8 @@
    "details": [],
    "checks": 6,
    "notes": [
-    "en: {\"landing\":\"Unpacked · Property bill explainer\",\"bill\":\"DEMO-7719 · Your bill · Unpacked\",\"breakdown\":\"DEMO-7719 · Why this amount? · Unpacked\",\"faq\":\"Common questions · Unpacked\",\"terms\":\"Terms · Unpacked\"}",
-    "hi: {\"landing\":\"Unpacked · संपत्ति बिल की व्याख्या\",\"bill\":\"DEMO-7719 · आपका बिल · Unpacked\",\"breakdown\":\"DEMO-7719 · यह राशि क्यों? · Unpacked\",\"faq\":\"सामान्य प्रश्न · Unpacked\",\"terms\":\"शर्तें · Unpacked\"}"
+    "en: {\"landing\":\"Unpacked \u00b7 Property bill explainer\",\"bill\":\"DEMO-7719 \u00b7 Your bill \u00b7 Unpacked\",\"breakdown\":\"DEMO-7719 \u00b7 Why this amount? \u00b7 Unpacked\",\"faq\":\"Common questions \u00b7 Unpacked\",\"terms\":\"Terms \u00b7 Unpacked\"}",
+    "hi: {\"landing\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"bill\":\"DEMO-7719 \u00b7 \u0906\u092a\u0915\u093e \u092c\u093f\u0932 \u00b7 Unpacked\",\"breakdown\":\"DEMO-7719 \u00b7 \u092f\u0939 \u0930\u093e\u0936\u093f \u0915\u094d\u092f\u094b\u0902? \u00b7 Unpacked\",\"faq\":\"\u0938\u093e\u092e\u093e\u0928\u094d\u092f \u092a\u094d\u0930\u0936\u094d\u0928 \u00b7 Unpacked\",\"terms\":\"\u0936\u0930\u094d\u0924\u0947\u0902 \u00b7 Unpacked\"}"
    ]
   },
   "SH-02": {
@@ -716,11 +716,11 @@
    "details": [],
    "checks": 10,
    "notes": [
-    "/: {\"title\":\"Unpacked · Property bill explainer\",\"ogTitle\":\"Unpacked · Property bill explainer\",\"ogDesc\":\"An independent hackathon prototype for understandable property tax bills.\",\"ogImage\":\"http://localhost:3000/opengraph-image?f70a4c96106d8e4a\",\"ogUrl\":\"http://localhost:3000\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/twitter-image?fac65c47b6ecdb89\",\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
-    "/bill/DEMO-7719: {\"title\":\"DEMO-7719 · Your bill · Unpacked\",\"ogTitle\":\"DEMO-7719 · Your bill · Unpacked\",\"ogDesc\":\"Demo property DEMO-7719 (a bill with a missed rebate): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/bill/DEMO-7719\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Demo property DEMO-7719 (a bill with a missed rebate): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\"}",
-    "/bill/DEMO-3982/breakdown: {\"title\":\"DEMO-3982 · Why this amount? · Unpacked\",\"ogTitle\":\"DEMO-3982 · Why this amount? · Unpacked\",\"ogDesc\":\"Demo property DEMO-3982 (an overdue bill with a penalty): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/bill/DEMO-3982/breakdown\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Demo property DEMO-3982 (an overdue bill with a penalty): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\"}",
-    "/faq: {\"title\":\"Common questions · Unpacked\",\"ogTitle\":\"Common questions · Unpacked\",\"ogDesc\":\"Plain answers about a property tax bill and about this prototype.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/faq\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Plain answers about a property tax bill and about this prototype.\"}",
-    "/terms: {\"title\":\"Terms · Unpacked\",\"ogTitle\":\"Terms · Unpacked\",\"ogDesc\":\"Independent hackathon prototype — synthetic and simulated data only.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/terms\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Independent hackathon prototype — synthetic and simulated data only.\"}"
+    "/: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":\"Unpacked \u00b7 Property bill explainer\",\"ogDesc\":\"An independent hackathon prototype for understandable property tax bills.\",\"ogImage\":\"http://localhost:3000/opengraph-image?f70a4c96106d8e4a\",\"ogUrl\":\"http://localhost:3000\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/twitter-image?fac65c47b6ecdb89\",\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/bill/DEMO-7719: {\"title\":\"DEMO-7719 \u00b7 Your bill \u00b7 Unpacked\",\"ogTitle\":\"DEMO-7719 \u00b7 Your bill \u00b7 Unpacked\",\"ogDesc\":\"Demo property DEMO-7719 (a bill with a missed rebate): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/bill/DEMO-7719\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Demo property DEMO-7719 (a bill with a missed rebate): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\"}",
+    "/bill/DEMO-3982/breakdown: {\"title\":\"DEMO-3982 \u00b7 Why this amount? \u00b7 Unpacked\",\"ogTitle\":\"DEMO-3982 \u00b7 Why this amount? \u00b7 Unpacked\",\"ogDesc\":\"Demo property DEMO-3982 (an overdue bill with a penalty): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/bill/DEMO-3982/breakdown\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Demo property DEMO-3982 (an overdue bill with a penalty): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\"}",
+    "/faq: {\"title\":\"Common questions \u00b7 Unpacked\",\"ogTitle\":\"Common questions \u00b7 Unpacked\",\"ogDesc\":\"Plain answers about a property tax bill and about this prototype.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/faq\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Plain answers about a property tax bill and about this prototype.\"}",
+    "/terms: {\"title\":\"Terms \u00b7 Unpacked\",\"ogTitle\":\"Terms \u00b7 Unpacked\",\"ogDesc\":\"Independent hackathon prototype \u2014 synthetic and simulated data only.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/terms\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Independent hackathon prototype \u2014 synthetic and simulated data only.\"}"
    ]
   },
   "SH-03": {
@@ -747,6 +747,36 @@
    "pass": true,
    "details": [],
    "checks": 12
+  },
+  "DT-01": {
+   "pass": true,
+   "details": [],
+   "checks": 18
+  },
+  "DT-03": {
+   "pass": true,
+   "details": [],
+   "checks": 72
+  },
+  "DT-04": {
+   "pass": true,
+   "details": [],
+   "checks": 36
+  },
+  "DT-02": {
+   "pass": true,
+   "details": [],
+   "checks": 18
+  },
+  "DT-05": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "DT-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
   }
  }
 }

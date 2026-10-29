@@ -298,7 +298,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, onHome, pa
           </div>
           <div className="amount-panel">
             <span>{paid ? t("bill.paidSimulated") : t("bill.amountDue")}</span>
-            <strong>{rupees(amounts.due)}</strong>
+            <div className="amount-line"><strong>{rupees(amounts.due)}</strong><span className="demo-tag">{t("demo.tag")}</span></div>
             <small>{paid ? (lastPayment ? <>{t("bill.simulatedVia", payModeLabel(t, lastPayment.mode))}<b>{lastPayment.reference}</b></> : t("bill.noRealPayment")) : t("bill.dueByFull", formatDateLocalised(lang, property.dueDate))}</small>
           </div>
         </section>
@@ -396,7 +396,7 @@ function Breakdown({ property, paid, onBack, onHome, onPay, onDispute }: { prope
       <Header property={property} onHome={onHome} onBack={onBack} screen="breakdown" />
       <main className="breakdown-main page-width">
         <div className="breadcrumb"><button onClick={onBack} type="button">{t("crumb.billSummary")}</button><Arrow /> <span>{t("crumb.whyThisAmount")}</span></div>
-        <section className="explain-intro"><div><span className="eyebrow"><span className="eyebrow-dot" />{t("bd.eyebrow")}</span><h1>{t("bd.h1", rupees(amounts.due))}</h1><p>{t("bd.intro")}</p></div><div className="explain-total"><span>{t("bill.amountDue")}</span><strong>{rupees(amounts.due)}</strong><small>{t("bd.due", formatDateLocalised(lang, property.dueDate))}</small></div></section>
+        <section className="explain-intro"><div><span className="eyebrow"><span className="eyebrow-dot" />{t("bd.eyebrow")}</span><h1>{t("bd.h1", rupees(amounts.due))}</h1><p>{t("bd.intro")}</p></div><div className="explain-total"><span>{t("bill.amountDue")}</span><div className="amount-line"><strong>{rupees(amounts.due)}</strong><span className="demo-tag">{t("demo.tag")}</span></div><small>{t("bd.due", formatDateLocalised(lang, property.dueDate))}</small></div></section>
 
         <section className="record-section" aria-labelledby="record-title">
           <div className="section-heading"><span>01</span><div><h2 id="record-title">{t("rec.title")}</h2><p>{t("rec.sub")}</p></div></div>

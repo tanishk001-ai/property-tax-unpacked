@@ -81,6 +81,10 @@ These are not bugs in the code; I did not change them.
 - **Firefox** (not installed here), Windows high-contrast mode, and the real Vercel analytics dashboard (events were checked at the call site, not on Vercel).
 - **The live site.** `property-tax-unpacked.vercel.app` still serves the old `main` build, where `/bill/…` links return 404. This branch must be merged (and the production deploy checked) before the link is posted.
 
+## Addendum: "Demo data" tag
+
+Added after the first pass so a cropped screenshot of a bill cannot pass as a real one: a "Demo data" / "डेमो डेटा" tag sits on the same line as the amount in the bill summary and in the breakdown header (cases DT-01..06, run at 320, 390 and 1366 px in both languages, all three properties, including the paid state). It stays on one line with the amount, never overlaps it, stays inside its panel, and measures well above AA contrast (dark brown on amber, about 9:1). Running the layout checks again found one real problem the tag introduced: at a 683 px wide window (200% zoom of a laptop) the breakdown header overflowed by 7 px; fixed in the same commit. The layout, Hindi-leftover, contrast and number checks were re-run and pass. Pictures: `qa/screenshots/demo-tag/`.
+
 ## Test mistakes I made and corrected
 
 The first runs reported some failures that were my test's fault, not the app's. They are recorded so the "before" column is honest: a text scan that glued neighbouring elements together (`textContent` instead of `innerText`), a Ctrl-click that macOS treats as a right-click, comparing an uppercase CSS label with mixed-case text, expecting `/?id=` to redirect when staying on the landing page is fine, a scroll measured before smooth scrolling finished, a legacy-clipboard fallback that really does copy, and the Next dev overlay being counted as an app element with no focus ring. None of them are counted as app bugs.
@@ -235,3 +239,9 @@ The first runs reported some failures that were my test's fault, not the app's. 
 | WK-01 | Landing and the three deep links render with no console errors in WebKit on an iPhone profile | · | ✅ | ✅ | · |  |
 | WK-02 | Full journey in WebKit: sample card → breakdown → expand → question → dispute → pay → receipt → paid, then Hindi | · | ✅ | ✅ | · |  |
 | WK-03 | No horizontal overflow and the bottom bar clears the content on the bill and breakdown in WebKit, English and Hindi | · | ✅ | ✅ | · |  |
+| DT-01 | Bill summary: the tag sits next to the amount, same line, reading "Demo data" / "डेमो डेटा", from the dictionary | · | ✅ | · | · |  |
+| DT-02 | Breakdown header: the same | · | ✅ | · | · |  |
+| DT-03 | The amount stays on one line, the tag does not overlap it and stays inside its panel | · | ✅ | · | · |  |
+| DT-04 | The tag text meets WCAG AA contrast (4.5:1) against the tag's own background | · | ✅ | · | · |  |
+| DT-05 | The tag is still there in the paid state | · | ✅ | · | · |  |
+| DT-06 | A screenshot cropped to the amount panel alone shows the tag (picture saved in `screenshots/demo-tag/`) | · | ✅ | · | · |  |
