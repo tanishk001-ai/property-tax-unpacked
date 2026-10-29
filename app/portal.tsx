@@ -433,9 +433,45 @@ function BottomActions({ onExplain, onPay, onDispute, paid = false }: { onExplai
   return <div className="bottom-wrap"><div className="bottom-actions page-width"><button className="bottom-secondary" type="button" onClick={onDispute}>{t("action.raiseDispute")}</button><div className="bottom-right"><button className="bottom-secondary desktop-only" type="button" onClick={onExplain}>{t("bill.whyThisAmount")}</button>{paid ? <span className="paid-label"><Icon name="check" />{t("action.paymentSimulated")}</span> : <button className="button button-primary" type="button" onClick={onPay}>{t("action.payBill")} <Arrow /></button>}</div></div></div>;
 }
 
-function Modal({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// A dialog that behaves like one: named for screen readers, takes focus when it opens
+// (and again when its content changes, e.g. form -> confirmation), keeps Tab inside,
+// closes on Escape, and hands focus back to whatever opened it.
+function Modal({ children, onClose, label, focusKey }: { children: ReactNode; onClose: () => void; label: string; focusKey?: string }) {
   const reduced = useReducedMotion();
-  return <motion.div className="modal-layer" role="presentation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={reduced ? { duration: 0.12 } : spring} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><motion.section role="dialog" aria-modal="true" className="modal-card" initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.99 }} transition={reduced ? { duration: 0.12 } : spring}>{children}</motion.section></motion.div>;
+  const card = useRef<HTMLElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    const items = () => (card.current ? Array.from(card.current.querySelectorAll<HTMLElement>(FOCUSABLE)) : []);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); closeRef.current(); return; }
+      if (event.key !== "Tab") return;
+      const list = items();
+      if (list.length === 0) { event.preventDefault(); return; }
+      const first = list[0];
+      const last = list[list.length - 1];
+      const active = document.activeElement;
+      const onCard = active === card.current;
+      const inside = !!card.current?.contains(active) && !onCard;
+      if (!inside || (event.shiftKey && active === first) || (!event.shiftKey && active === last)) {
+        event.preventDefault();
+        (event.shiftKey && (inside || onCard) ? last : first).focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      if (opener && opener !== document.body && document.contains(opener)) opener.focus();
+    };
+  }, []);
+
+  useEffect(() => { card.current?.focus(); }, [focusKey]);
+
+  return <motion.div className="modal-layer" role="presentation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={reduced ? { duration: 0.12 } : spring} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><motion.section ref={card} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className="modal-card" initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.99 }} transition={reduced ? { duration: 0.12 } : spring}>{children}</motion.section></motion.div>;
 }
 
 const PAY_MODES: PayMode[] = ["UPI", "Card", "Net Banking"];
@@ -462,7 +498,7 @@ function PaymentModal({ property, onClose, onPaid }: { property: Property; onClo
   const close = receipt ? () => onPaid(receipt) : onClose;
 
   return (
-    <Modal onClose={close}>
+    <Modal onClose={close} label={receipt ? t("rcpt.eyebrow") : t("pay.confirmTitle")} focusKey={receipt ? "receipt" : "form"}>
       {receipt ? (
         <div className="modal-content receipt-content">
           <button className="modal-close" onClick={close} type="button" aria-label={t("rcpt.close")}><Icon name="close" /></button>
@@ -524,7 +560,7 @@ function DisputeModal({ property, initialLine, resetKey, onClose }: { property: 
   }
   const lineLabel = disputeLabel(t, lang, property, lineId);
   const reason = t("disp.reason", lineLabel, property.id);
-  return <Modal onClose={onClose}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); trackEvent("dispute_submitted", { id: property.id, line: lineId }); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" key={`${lineId}-${lang}`} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
+  return <Modal onClose={onClose} label={submitted ? t("disp.recorded") : t("action.raiseDispute")} focusKey={submitted ? "done" : "form"}>{submitted ? <div className="modal-content dispute-confirmation"><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.closeConfirmation")}><Icon name="close" /></button><div className="success-icon"><Icon name="check" /></div><span className="eyebrow"><span className="eyebrow-dot" />{t("disp.recorded")}</span><h2>{t("disp.ready")}</h2><p>{t("disp.attachedLine", lineLabel)}</p><div className="reference-box"><span>{t("disp.referenceNumber")}</span><strong>{reference}</strong><button onClick={() => { navigator.clipboard?.writeText(reference); setCopied(true); }} type="button"><Icon name="copy" />{copied ? t("disp.copied") : t("disp.copy")}</button></div><div className="timeline"><div><b>{t("disp.within2")}</b><span>{t("disp.within2Body")}</span></div><div><b>{t("disp.within7")}</b><span>{t("disp.within7Body")}</span></div></div><button className="button button-dark button-full" onClick={onClose} type="button">{t("disp.done")} <Arrow /></button></div> : <form className="modal-content dispute-form" onSubmit={(event) => { event.preventDefault(); trackEvent("dispute_submitted", { id: property.id, line: lineId }); setReference(makeReference("DPT", property.id)); setSubmitted(true); }}><button className="modal-close" onClick={onClose} type="button" aria-label={t("disp.close")}><Icon name="close" /></button><span className="eyebrow"><span className="eyebrow-dot" />{t("action.raiseDispute")}</span><h2>{t("disp.startTitle")}</h2><p>{t("disp.startBody")}</p><label htmlFor="dispute-line">{t("disp.lineToReview")}</label><select id="dispute-line" value={lineId} onChange={(event) => setLineId(event.target.value as DisputeId)}>{DISPUTE_IDS.map((id) => <option key={id} value={id}>{disputeLabel(t, lang, property, id)}</option>)}</select><label htmlFor="dispute-reason">{t("disp.whatChecked")}</label><textarea id="dispute-reason" key={`${lineId}-${lang}`} defaultValue={reason} rows={4} /><div className="dispute-attachment"><Icon name="receipt" /><span><b>{t("disp.attachedAuto")}</b><small>{t("disp.attachedAutoBody")}</small></span></div><button className="button button-primary button-full" type="submit">{t("disp.submit")} <Arrow /></button><p className="form-footnote">{t("disp.footnote")}</p></form>}</Modal>;
 }
 
 // The landing page. With `notFound` set it is what /bill/<unknown id> renders:
