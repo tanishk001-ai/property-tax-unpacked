@@ -57,8 +57,8 @@ example `/bill/DEMO-7719/breakdown`.
 - **Full English/Hindi toggle** — every screen, persisted across navigation
 - **FAQ** — eight questions a real citizen would actually ask, in-voice
 - **Anonymous analytics** — Vercel Web Analytics page views plus custom events
-  (property opened, breakdown opened, line expanded, dispute submitted, payment
-  simulated, language switched). Events carry only demo property IDs, line ids,
+  (property opened, breakdown opened, line expanded, "question this line" clicked,
+  dispute submitted, payment simulated, language switched). Events carry only demo property IDs, line ids,
   the payment mode and the language — nothing a visitor types. Custom events need
   a Vercel Pro or Enterprise plan; page views work on any plan
 
@@ -74,9 +74,11 @@ Full disclosure at [`/terms`](https://property-tax-unpacked.vercel.app/terms).
 
 ## Stack
 
-Next.js, TypeScript, deployed on Vercel. No backend database and no server APIs —
+Next.js, TypeScript, deployed on Vercel. No backend database and no API routes —
 calculation logic and seeded property data run entirely client-side against a
-static dataset. Vercel Web Analytics is the only external service.
+static dataset. The only server code is a small middleware that redirects old
+`/?id=` links and answers unknown bill addresses. Vercel Web Analytics is the
+only external service.
 
 ## Running locally
 
