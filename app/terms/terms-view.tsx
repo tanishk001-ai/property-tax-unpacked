@@ -1,10 +1,11 @@
 "use client";
 
-import { useI18n, LangToggle } from "../i18n";
+import { useI18n, useDocumentTitle, LangToggle } from "../i18n";
 import { BackLink } from "../back-link";
 
 export function TermsView() {
   const { t } = useI18n();
+  useDocumentTitle("meta.title.terms");
   return (
     <main className="terms-page page-width">
       <div className="page-topbar"><BackLink /><LangToggle /></div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useI18n, LangToggle } from "../i18n";
+import { useI18n, useDocumentTitle, LangToggle } from "../i18n";
 import { BackLink } from "../back-link";
 import type { StrKey } from "../strings";
 
@@ -19,6 +19,7 @@ const FAQ_KEYS: { q: StrKey; a: StrKey }[] = [
 
 export function FaqView() {
   const { t } = useI18n();
+  useDocumentTitle("meta.title.faq");
   return (
     <main className="terms-page faq-page page-width">
       <div className="page-topbar"><BackLink /><LangToggle /></div>

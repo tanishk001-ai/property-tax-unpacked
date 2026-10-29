@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { STR, type StrKey } from "./strings";
+import { translate, type StrKey } from "./strings";
+import { trackEvent } from "./analytics";
 
 export type Lang = "en" | "hi";
 
@@ -34,15 +35,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = useCallback(
-    (key: StrKey, ...args: (string | number)[]) => {
-      const entry = STR[key];
-      const value = entry ? entry[lang] : undefined;
-      if (value == null) return key;
-      return typeof value === "function" ? (value as (...a: (string | number)[]) => string)(...args) : value;
-    },
-    [lang],
-  );
+  // Keep <html lang> in step with the toggle (screen readers, hyphenation, fonts).
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const t = useCallback((key: StrKey, ...args: (string | number)[]) => translate(lang, key, ...args), [lang]);
 
   const ctx = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
   return <I18nContext.Provider value={ctx}>{children}</I18nContext.Provider>;
@@ -52,14 +50,39 @@ export function useI18n() {
   return useContext(I18nContext);
 }
 
+// Sets the browser tab title in the active language.
+export function useDocumentTitle(key: StrKey, ...args: (string | number)[]) {
+  const { t } = useI18n();
+  const title = t(key, ...args);
+  useEffect(() => {
+    const apply = () => {
+      if (document.title !== title) document.title = title;
+    };
+    apply();
+    // Next re-renders its own <title> from the layout metadata after hydration, which
+    // would put the English title back. In production it sits in <head>; the dev server
+    // streams it into <body>, so watch the whole document for changes to a <title>.
+    const touchesTitle = (r: MutationRecord) =>
+      r.target.nodeName === "TITLE" || r.target.parentNode?.nodeName === "TITLE" || Array.from(r.addedNodes).some((n) => n.nodeName === "TITLE");
+    const observer = new MutationObserver((records) => { if (records.some(touchesTitle)) apply(); });
+    observer.observe(document.documentElement, { childList: true, characterData: true, subtree: true });
+    return () => observer.disconnect();
+  }, [title]);
+}
+
 export function LangToggle({ compact = false }: { compact?: boolean }) {
-  const { lang, setLang } = useI18n();
+  const { lang, setLang, t } = useI18n();
+  const choose = (next: Lang) => {
+    if (next === lang) return;
+    trackEvent("language_switched", { to: next });
+    setLang(next);
+  };
   return (
-    <div className={`lang-toggle ${compact ? "lang-toggle-compact" : ""}`} role="group" aria-label="Language / भाषा">
-      <button type="button" className={lang === "en" ? "is-active" : ""} aria-pressed={lang === "en"} onClick={() => setLang("en")}>
+    <div className={`lang-toggle ${compact ? "lang-toggle-compact" : ""}`} role="group" aria-label={t("lang.group")}>
+      <button type="button" className={lang === "en" ? "is-active" : ""} aria-pressed={lang === "en"} onClick={() => choose("en")}>
         EN
       </button>
-      <button type="button" className={lang === "hi" ? "is-active" : ""} aria-pressed={lang === "hi"} onClick={() => setLang("hi")}>
+      <button type="button" lang="hi" className={lang === "hi" ? "is-active" : ""} aria-pressed={lang === "hi"} onClick={() => choose("hi")}>
         हिं
       </button>
     </div>

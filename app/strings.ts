@@ -9,8 +9,6 @@
 //   late-payment charge → विलंब शुल्क | dispute → आपत्ति | bill/receipt → बिल/रसीद
 //   payment → भुगतान | ward → वार्ड | guideline rate → गाइडलाइन दर
 //   S/O·D/O·W/O → पुत्र·पुत्री·पत्नी | owner name → स्वामी का नाम
-//   SWM cess → ठोस अपशिष्ट प्रबंधन उपकर | library cess → पुस्तकालय उपकर
-//   health cess → स्वास्थ्य उपकर
 
 import type { Lang } from "./i18n";
 
@@ -30,6 +28,15 @@ export function formatDateLocalised(lang: Lang, s: string): string {
     /January|February|March|April|May|June|July|August|September|October|November|December/g,
     (m) => MONTHS_HI[m] ?? m,
   );
+}
+
+// Look up a dictionary entry for a given language (used by the i18n context's
+// t() and, directly, where a view needs both languages at once).
+export function translate(lang: Lang, key: StrKey, ...args: (string | number)[]): string {
+  const entry = STR[key];
+  const value = entry ? entry[lang] : undefined;
+  if (value == null) return key;
+  return typeof value === "function" ? (value as Fn)(...args) : value;
 }
 
 // Translate a fixed data value (from properties.json) by looking it up by its
@@ -54,7 +61,18 @@ export const STR = {
   "pill.property": { en: "Property", hi: "संपत्ति" },
   "pill.bill": { en: "Bill", hi: "बिल" },
   "pill.explanation": { en: "Explanation", hi: "विवरण" },
-  "lang.group": { en: "Language / भाषा", hi: "भाषा / Language" },
+  "lang.group": { en: "Language", hi: "भाषा" },
+  "meta.title.home": { en: "Unpacked · Property bill explainer", hi: "Unpacked · संपत्ति बिल की व्याख्या" },
+  "meta.title.terms": { en: "Terms · Unpacked", hi: "शर्तें · Unpacked" },
+  "meta.title.faq": { en: "Common questions · Unpacked", hi: "सामान्य प्रश्न · Unpacked" },
+  "meta.title.bill": { en: (id) => `${id} · Your bill · Unpacked`, hi: (id) => `${id} · आपका बिल · Unpacked` },
+  "meta.title.breakdown": { en: (id) => `${id} · Why this amount? · Unpacked`, hi: (id) => `${id} · यह राशि क्यों? · Unpacked` },
+  "meta.title.notfound": { en: "Page not found · Unpacked", hi: "पेज नहीं मिला · Unpacked" },
+  "nf.title": { en: "This page doesn’t exist.", hi: "यह पेज मौजूद नहीं है।" },
+  "nf.body": { en: "The link may be mistyped. Open one of the demo bills from the home page.", hi: "लिंक में कोई गलती हो सकती है। मुख्य पेज से कोई डेमो बिल खोलें।" },
+  "nf.home": { en: "Go to the home page", hi: "मुख्य पेज पर जाएँ" },
+  "aria.prototype": { en: "Prototype disclosure", hi: "प्रोटोटाइप संबंधी सूचना" },
+  "aria.billDetails": { en: "Bill summary details", hi: "बिल सारांश विवरण" },
 
   // ---- landing / lookup ----
   "landing.eyebrow": { en: "For Sampurna Nagar · demo", hi: "संपूर्णा नगर के लिए · डेमो" },
@@ -93,6 +111,16 @@ export const STR = {
   "Neem Residency": { en: "Neem Residency", hi: "नीम रेज़िडेंसी" },
   "Market Ward": { en: "Market Ward", hi: "मार्केट वार्ड" },
   "Sampurna Nagar": { en: "Sampurna Nagar", hi: "संपूर्णा नगर" },
+  "Ward 8": { en: "Ward 8", hi: "वार्ड 8" },
+  "Ward 14": { en: "Ward 14", hi: "वार्ड 14" },
+  "Ward 6": { en: "Ward 6", hi: "वार्ड 6" },
+  // Seeded owner names — transliterated for the Hindi view.
+  "Suresh Kumar Nair": { en: "Suresh Kumar Nair", hi: "सुरेश कुमार नायर" },
+  "Gopalan Nair": { en: "Gopalan Nair", hi: "गोपालन नायर" },
+  "Anjali Verma": { en: "Anjali Verma", hi: "अंजलि वर्मा" },
+  "Ramesh Chandra Verma": { en: "Ramesh Chandra Verma", hi: "रमेश चंद्र वर्मा" },
+  "Fatima Sheikh": { en: "Fatima Sheikh", hi: "फ़ातिमा शेख़" },
+  "Imran Sheikh": { en: "Imran Sheikh", hi: "इमरान शेख़" },
   "Central residential zone": { en: "Central residential zone", hi: "मध्य आवासीय क्षेत्र" },
   "North residential zone": { en: "North residential zone", hi: "उत्तर आवासीय क्षेत्र" },
   "Commercial corridor": { en: "Commercial corridor", hi: "वाणिज्यिक गलियारा" },
@@ -123,23 +151,23 @@ export const STR = {
     en: "A co-owner is marked as 60+. The declaration is not on file, so this has not been deducted.",
     hi: "एक सह-स्वामी 60+ के रूप में चिह्नित है। घोषणा फ़ाइल में नहीं है, इसलिए यह घटाई नहीं गई है।",
   },
-  "The 2025–26 bill remained unpaid after its 31 March 2026 due date.": {
-    en: "The 2025–26 bill remained unpaid after its 31 March 2026 due date.",
-    hi: "2025–26 का बिल अपनी 31 मार्च 2026 की नियत तिथि के बाद अदत्त रहा।",
+  "pen.reason": {
+    en: (fy, due) => `The ${fy} bill remained unpaid after its ${due} due date.`,
+    hi: (fy, due) => `${fy} का बिल अपनी ${due} की नियत तिथि के बाद अदत्त रहा।`,
   },
 
   // ---- bill summary ----
   "bill.status.paid": { en: "Payment simulated", hi: "भुगतान सिम्युलेटेड" },
   "bill.status.paidRebate": {
     en: "Payment simulated · rebate still unclaimed",
-    hi: "भुगतान सिम्युलेटेड · छूट अब भी अदावाकृत",
+    hi: "भुगतान सिम्युलेटेड · छूट का दावा अब भी बाकी",
   },
-  "bill.title": { en: "Your 2025–26 property tax bill", hi: "आपका 2025–26 संपत्ति कर बिल" },
+  "bill.title": { en: (fy) => `Your ${fy} property tax bill`, hi: (fy) => `आपका ${fy} संपत्ति कर बिल` },
   "bill.amountDue": { en: "Amount due", hi: "देय राशि" },
+  "demo.tag": { en: "Demo data", hi: "डेमो डेटा" },
   "bill.paidSimulated": { en: "Paid (simulated)", hi: "भुगतान (सिम्युलेटेड)" },
   "bill.noRealPayment": { en: "No real payment was processed.", hi: "कोई वास्तविक भुगतान नहीं हुआ।" },
   "bill.simulatedVia": { en: (m) => `Simulated via ${m} · `, hi: (m) => `${m} के ज़रिए सिम्युलेटेड · ` },
-  "bill.dueBy": { en: (d) => `Due by `, hi: (d) => `` }, // date rendered separately; prefix only
   "bill.dueByFull": { en: (d) => `Due by ${d}`, hi: (d) => `${d} तक देय` },
   "bill.saving.titleUnpaid": {
     en: "You may be paying more than you need to.",
@@ -160,7 +188,7 @@ export const STR = {
   "bill.warn.understand": { en: "Understand it", hi: "समझें" },
   "bill.details": { en: "Bill details", hi: "बिल विवरण" },
   "bill.period": { en: "Bill period", hi: "बिल अवधि" },
-  "bill.periodValue": { en: "1 Apr 2025 – 31 Mar 2026", hi: "1 अप्रैल 2025 – 31 मार्च 2026" },
+  "bill.periodValue": { en: (start, end) => `${start} – ${end}`, hi: (start, end) => `${start} – ${end}` },
   "bill.issuedOn": { en: "Issued on", hi: "जारी तिथि" },
   "bill.dueDate": { en: "Due date", hi: "नियत तिथि" },
   "bill.propertyUse": { en: "Property use", hi: "संपत्ति का उपयोग" },
@@ -202,6 +230,21 @@ export const STR = {
     en: "The municipal record for this property, and the facts the calculation starts with.",
     hi: "इस संपत्ति का नगरपालिका रिकॉर्ड, और वे तथ्य जिनसे गणना शुरू होती है।",
   },
+  "rec.khata": { en: "Khata number", hi: "खाता संख्या" },
+  // TODO(i18n): "Survey number" has regional variants (सर्वे नंबर / सर्वे संख्या / भूमि सर्वेक्षण संख्या).
+  "rec.survey": { en: "Survey number", hi: "सर्वे संख्या" },
+  "rec.ward": { en: "Ward", hi: "वार्ड" },
+  "rec.owner": { en: "Owner name", hi: "स्वामी का नाम" },
+  "rec.guideline": { en: "Government guideline rate", hi: "सरकारी गाइडलाइन दर" },
+  "rec.guidelineValue": { en: (rate) => `${rate}/m²`, hi: (rate) => `${rate}/वर्ग मीटर` },
+  "rec.guidelineNote": {
+    en: "A separate reference valuation (illustrative in this prototype) — it does not affect this bill’s calculation.",
+    hi: "एक अलग संदर्भ मूल्यांकन (इस प्रोटोटाइप में काल्पनिक) — यह इस बिल की गणना को प्रभावित नहीं करता।",
+  },
+  "rel.S/O": { en: "S/O", hi: "पुत्र" },
+  "rel.D/O": { en: "D/O", hi: "पुत्री" },
+  "rel.W/O": { en: "W/O", hi: "पत्नी" },
+  "unit.sqm": { en: (n) => `${n} m²`, hi: (n) => `${n} वर्ग मीटर` },
   "rec.builtUpArea": { en: "Built-up area", hi: "निर्मित क्षेत्र" },
   "rec.zone": { en: "Zone", hi: "क्षेत्र" },
   "rec.usage": { en: "Usage", hi: "उपयोग" },
@@ -223,44 +266,32 @@ export const STR = {
   "calc.f.age": { en: "age", hi: "आयु" },
   "calc.f.occupancy": { en: "occupancy", hi: "अधिभोग" },
   "calc.thenRate": { en: "Then the annual tax rate is applied. Here is each step.", hi: "फिर वार्षिक कर दर लागू होती है। यहाँ हर चरण है।" },
-  "calc.cessNote": {
-    en: (rate, tax) =>
-      `Base property tax, library cess, health cess and SWM cess are a split of the single ${rate}% municipal rate — a real bill shows only the combined figure. Together they equal your annual property tax of ${tax}, before any rebate or late-payment charge.`,
-    hi: (rate, tax) =>
-      `मूल संपत्ति कर, पुस्तकालय उपकर, स्वास्थ्य उपकर और SWM उपकर एक ही ${rate}% नगरपालिका दर का विभाजन हैं — असली बिल केवल संयुक्त आँकड़ा दिखाता है। मिलकर ये किसी छूट या विलंब शुल्क से पहले आपके ${tax} वार्षिक संपत्ति कर के बराबर हैं।`,
-  },
 
   // ---- calculation line labels ----
   "line.builtUpArea": { en: "Built-up area", hi: "निर्मित क्षेत्र" },
   "line.useFactor": { en: (u) => `${u} use factor`, hi: (u) => `${u} उपयोग गुणक` },
   "line.ageFactor": { en: (n) => `${n}-year building age factor`, hi: (n) => `${n}-वर्ष भवन आयु गुणक` },
   "line.occupancyFactor": { en: (o) => `${o} factor`, hi: (o) => `${o} गुणक` },
-  "line.baseTax": { en: "Base property tax", hi: "मूल संपत्ति कर" },
-  "line.libraryCess": { en: "Library cess", hi: "पुस्तकालय उपकर" },
-  "line.healthCess": { en: "Health cess", hi: "स्वास्थ्य उपकर" },
-  "line.swmCess": { en: "Solid Waste Management (SWM) cess", hi: "ठोस अपशिष्ट प्रबंधन (SWM) उपकर" },
   "line.annualPropertyTax": { en: "Annual property tax", hi: "वार्षिक संपत्ति कर" },
   "line.appliedRebate": { en: "Applied rebate", hi: "लागू छूट" },
   "line.latePaymentCharge": { en: "Late-payment charge", hi: "विलंब शुल्क" },
   "line.amountDue": { en: "Amount due", hi: "देय राशि" },
 
   // ---- calculation line helpers ----
-  "help.area": { en: (a, u) => `${a} m² × ${u}/m²/month × 12 months`, hi: (a, u) => `${a} m² × ${u}/m²/माह × 12 माह` },
+  "help.area": { en: (a, u) => `${a} m² × ${u}/m²/month × 12 months`, hi: (a, u) => `${a} वर्ग मीटर × ${u}/वर्ग मीटर/माह × 12 माह` },
   "help.useFactor": { en: (f) => `Assessed value × ${f}`, hi: (f) => `निर्धारित मूल्य × ${f}` },
   "help.ageFactor": { en: (f) => `Adjusted value × ${f}`, hi: (f) => `समायोजित मूल्य × ${f}` },
   "help.occupancyFactor": { en: (f) => `Adjusted value × ${f}`, hi: (f) => `समायोजित मूल्य × ${f}` },
-  "help.baseTax": { en: (v) => `Core municipal tax on ${v} assessed value`, hi: (v) => `${v} निर्धारित मूल्य पर मूल नगरपालिका कर` },
-  "help.cess1pct": { en: "≈1% of assessed value", hi: "निर्धारित मूल्य का ≈1%" },
-  "help.cessSwm": { en: "≈1.5% of assessed value", hi: "निर्धारित मूल्य का ≈1.5%" },
+  "help.annualTax": { en: (v, rate) => `${v} × ${rate}% tax rate`, hi: (v, rate) => `${v} × ${rate}% कर दर` },
   "help.penalty": { en: (r, m) => `${r}% per month for ${m} months`, hi: (r, m) => `${m} माह के लिए ${r}% प्रति माह` },
   "help.totalDue": { en: "Tax after applied rebates and charges", hi: "लागू छूट और शुल्कों के बाद कर" },
 
   // ---- calculation line detail text ----
   "det.area": {
     en: (area, uav, total) =>
-      `Your recorded built-up area is ${area} square metres. The zone's published unit-area value is ${uav} per square metre per month. Together, they produce an annual assessed value of ${total} before property-specific factors.`,
+      `Your recorded built-up area is ${area} square metres. The zone's unit-area value in this prototype is ${uav} per square metre per month. Together, they produce an annual assessed value of ${total} before property-specific factors.`,
     hi: (area, uav, total) =>
-      `आपका दर्ज निर्मित क्षेत्र ${area} वर्ग मीटर है। इस क्षेत्र का प्रकाशित इकाई-क्षेत्र मूल्य ${uav} प्रति वर्ग मीटर प्रति माह है। मिलकर, ये संपत्ति-विशिष्ट गुणकों से पहले ${total} का वार्षिक निर्धारित मूल्य देते हैं।`,
+      `आपका दर्ज निर्मित क्षेत्र ${area} वर्ग मीटर है। इस प्रोटोटाइप में इस क्षेत्र का इकाई-क्षेत्र मूल्य ${uav} प्रति वर्ग मीटर प्रति माह है। मिलकर, ये संपत्ति-विशिष्ट गुणकों से पहले ${total} का वार्षिक निर्धारित मूल्य देते हैं।`,
   },
   "det.useFactor": {
     en: (use, f, val) =>
@@ -280,29 +311,11 @@ export const STR = {
     hi: (occ, f, val) =>
       `रिकॉर्ड कहता है कि यह संपत्ति ${occ} है। मिलान वाला अधिभोग गुणक ${f} है, जिससे ${val} का अंतिम निर्धारित मूल्य मिलता है।`,
   },
-  "det.baseTax": {
-    en: (val, rate, base) =>
-      `The core municipal property tax on your final assessed value of ${val}. A real bill folds this into one ${rate}% headline rate; here it is that rate minus the three earmarked cesses below — not an extra charge. It comes to ${base}.`,
-    hi: (val, rate, base) =>
-      `आपके ${val} के अंतिम निर्धारित मूल्य पर मूल नगरपालिका संपत्ति कर। असली बिल इसे एक ${rate}% मुख्य दर में समेट देता है; यहाँ यह वह दर है, नीचे के तीन निर्दिष्ट उपकरों को घटाकर — कोई अतिरिक्त शुल्क नहीं। यह ${base} बनता है।`,
-  },
-  "det.libraryCess": {
-    en: (amt) =>
-      `A fixed levy funding public libraries in your ward — applied to every property regardless of usage. Municipal bills bundle it into the headline tax rate and never itemise it; this prototype shows it on its own line: ${amt}.`,
-    hi: (amt) =>
-      `आपके वार्ड में सार्वजनिक पुस्तकालयों के लिए एक निश्चित उगाही — हर संपत्ति पर, उपयोग चाहे जो हो। नगरपालिका बिल इसे मुख्य कर दर में मिला देते हैं और कभी अलग नहीं दिखाते; यह प्रोटोटाइप इसे अपनी अलग पंक्ति में दिखाता है: ${amt}।`,
-  },
-  "det.healthCess": {
-    en: (amt, tax) =>
-      `A fixed levy funding municipal primary health centres and sanitation drives — also applied to every property regardless of usage, and also hidden inside the headline rate on a real bill: ${amt}.`,
-    hi: (amt, tax) =>
-      `नगरपालिका प्राथमिक स्वास्थ्य केंद्रों और स्वच्छता अभियानों के लिए एक निश्चित उगाही — यह भी हर संपत्ति पर, उपयोग चाहे जो हो, और असली बिल में मुख्य दर के भीतर छिपी हुई: ${amt}।`,
-  },
-  "det.swmCess": {
-    en: (amt, tax) =>
-      `Funds collection, transport, and disposal of solid waste in your ward — charged to every property regardless of usage. Base property tax plus all three cesses equals your ${tax} annual property tax.`,
-    hi: (amt, tax) =>
-      `आपके वार्ड में ठोस अपशिष्ट के संग्रह, परिवहन और निपटान का वित्तपोषण — हर संपत्ति पर, उपयोग चाहे जो हो। मूल संपत्ति कर और तीनों उपकर मिलकर आपके ${tax} वार्षिक संपत्ति कर के बराबर हैं।`,
+  "det.annualTax": {
+    en: (rate, tax) =>
+      `The prototype applies a ${rate}% annual municipal tax rate to the final assessed value. That produces the tax amount before rebates or late-payment charges: ${tax}.`,
+    hi: (rate, tax) =>
+      `प्रोटोटाइप अंतिम निर्धारित मूल्य पर ${rate}% वार्षिक नगरपालिका कर दर लगाता है। इससे छूट या विलंब शुल्क से पहले का कर बनता है: ${tax}।`,
   },
   "det.penalty": {
     en: (reason, start, rate, before, months, total) =>
@@ -373,6 +386,8 @@ export const STR = {
   "rcpt.amountPaid": { en: "Amount paid", hi: "भुगतान की गई राशि" },
   "rcpt.mode": { en: "Payment mode", hi: "भुगतान का तरीका" },
   "rcpt.timestamp": { en: "Timestamp", hi: "समय-चिह्न" },
+  "rcpt.tz": { en: "IST", hi: "भारतीय समय" },
+  "rcpt.qrTitle": { en: (ref) => `Receipt ${ref}`, hi: (ref) => `रसीद ${ref}` },
   "rcpt.disclaimer": {
     en: "Mock receipt — for prototype demonstration only, not valid proof of payment.",
     hi: "मॉक रसीद — केवल प्रोटोटाइप प्रदर्शन के लिए, भुगतान का वैध प्रमाण नहीं।",
@@ -390,6 +405,7 @@ export const STR = {
   "disp.referenceNumber": { en: "Reference number", hi: "संदर्भ संख्या" },
   "disp.copy": { en: "Copy", hi: "कॉपी करें" },
   "disp.copied": { en: "Copied", hi: "कॉपी हुआ" },
+  "disp.copyFailed": { en: "Couldn’t copy. Select the number and copy it.", hi: "कॉपी नहीं हो सका। नंबर चुनकर कॉपी करें।" },
   "disp.within2": { en: "Within 2 working days", hi: "2 कार्य दिवसों में" },
   "disp.within2Body": {
     en: "A record-check team reviews the property detail and rule.",
@@ -432,16 +448,16 @@ export const STR = {
   "note.fullTerms": { en: "Full terms", hi: "पूरी शर्तें" },
   "note.faq": { en: "FAQ", hi: "सामान्य प्रश्न" },
   "note.body": {
-    en: "This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations, cess splits and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.",
-    hi: "यह कोई सरकारी उत्पाद नहीं है और किसी नगरपालिका निकाय या कर पोर्टल से संबद्ध नहीं है। सभी संपत्ति डेटा, गणनाएँ, उपकर विभाजन और भुगतान इतिहास मॉक और काल्पनिक हैं। भुगतान सिम्युलेटेड है; भुगतान-तरीके का चयन दिखावटी है और कोई लेन-देन नहीं होता। यहाँ बनी कोई भी रसीद या QR कोड केवल प्रदर्शन है और भुगतान का वैध प्रमाण नहीं है। बिल स्पष्टीकरण और आपत्ति ग्रहण आज काम करते हैं; नगरपालिका सत्यापन मॉक है।",
+    en: "This is not a government product and is not affiliated with any municipal body or tax portal. All property data, calculations and payment history are mock and synthetic. Payment is simulated; the payment-method choice is cosmetic and no transaction occurs. Any receipt or QR code generated here is a demonstration only and is not valid proof of payment. Bill explanations and dispute intake work today; municipal verification is mocked.",
+    hi: "यह कोई सरकारी उत्पाद नहीं है और किसी नगरपालिका निकाय या कर पोर्टल से संबद्ध नहीं है। सभी संपत्ति डेटा, गणनाएँ और भुगतान इतिहास मॉक और काल्पनिक हैं। भुगतान सिम्युलेटेड है; भुगतान-तरीके का चयन दिखावटी है और कोई लेन-देन नहीं होता। यहाँ बनी कोई भी रसीद या QR कोड केवल प्रदर्शन है और भुगतान का वैध प्रमाण नहीं है। बिल स्पष्टीकरण और आपत्ति ग्रहण आज काम करते हैं; नगरपालिका सत्यापन मॉक है।",
   },
 
   // ---- /terms ----
   "terms.title": { en: "Terms", hi: "शर्तें" },
   "terms.back": { en: "Back", hi: "वापस" },
   "terms.body": {
-    en: "This is an independent hackathon prototype, not a government product or service. All property records, calculations, and payments shown are synthetic and simulated — no real data is collected, stored, or transmitted, and no payment gateway is contacted. Nothing here should be relied on as an actual property tax record.",
-    hi: "यह एक स्वतंत्र हैकाथॉन प्रोटोटाइप है, कोई सरकारी उत्पाद या सेवा नहीं। दिखाए गए सभी संपत्ति रिकॉर्ड, गणनाएँ और भुगतान काल्पनिक और सिम्युलेटेड हैं — कोई वास्तविक डेटा एकत्र, संग्रहीत या प्रेषित नहीं किया जाता, और किसी भुगतान गेटवे से संपर्क नहीं किया जाता। यहाँ किसी भी चीज़ को वास्तविक संपत्ति कर रिकॉर्ड के रूप में भरोसे में नहीं लेना चाहिए।",
+    en: "This is an independent hackathon prototype, not a government product or service. All property records, calculations, and payments shown are synthetic and simulated: no real property data is used, nothing you type into the forms is stored or sent anywhere, and no payment gateway is contacted. The site keeps only your language choice, in your own browser, and counts anonymous usage (page views and which buttons are used, such as which demo bill was opened) without cookies or personal data. Nothing here should be relied on as an actual property tax record.",
+    hi: "यह एक स्वतंत्र हैकाथॉन प्रोटोटाइप है, कोई सरकारी उत्पाद या सेवा नहीं। दिखाए गए सभी संपत्ति रिकॉर्ड, गणनाएँ और भुगतान काल्पनिक और सिम्युलेटेड हैं: कोई वास्तविक संपत्ति डेटा इस्तेमाल नहीं होता, फ़ॉर्म में आप जो लिखते हैं वह कहीं सहेजा या भेजा नहीं जाता, और किसी भुगतान गेटवे से संपर्क नहीं किया जाता। साइट केवल आपकी भाषा की पसंद आपके अपने ब्राउज़र में रखती है, और बिना कुकी या व्यक्तिगत जानकारी के गुमनाम उपयोग गिनती है (पेज व्यूज़ और कौन-से बटन इस्तेमाल हुए, जैसे कौन-सा डेमो बिल खोला गया)। यहाँ किसी भी चीज़ को वास्तविक संपत्ति कर रिकॉर्ड के रूप में भरोसे में नहीं लेना चाहिए।",
   },
 
   // ---- /faq ----
@@ -453,16 +469,16 @@ export const STR = {
   "faq.back": { en: "Back", hi: "वापस" },
   "faq.q1": { en: "How is my property tax calculated?", hi: "मेरा संपत्ति कर कैसे निकाला जाता है?" },
   "faq.a1": {
-    en: "It uses the unit-area method shown in “Why this amount?”: your built-up area is multiplied by a published per-square-metre value, then adjusted by factors for use, building age and occupancy. A municipal tax rate is applied to that assessed value to get the annual tax, before rebates or any late fee.",
-    hi: "यह “यह राशि क्यों?” में दिखाई गई इकाई-क्षेत्र विधि का उपयोग करता है: आपके निर्मित क्षेत्र को प्रति वर्ग मीटर के प्रकाशित मूल्य से गुणा किया जाता है, फिर उपयोग, भवन की आयु और अधिभोग के गुणकों से समायोजित किया जाता है। उस निर्धारित मूल्य पर एक नगरपालिका कर दर लगाकर वार्षिक कर मिलता है, छूट या किसी विलंब शुल्क से पहले।",
+    en: "It uses the unit-area method shown in “Why this amount?”: your built-up area is multiplied by the zone’s per-square-metre value, then adjusted by factors for use, building age and occupancy. A municipal tax rate is applied to that assessed value to get the annual tax, before rebates or any late fee.",
+    hi: "यह “यह राशि क्यों?” में दिखाई गई इकाई-क्षेत्र विधि का उपयोग करता है: आपके निर्मित क्षेत्र को क्षेत्र के प्रति वर्ग मीटर मूल्य से गुणा किया जाता है, फिर उपयोग, भवन की आयु और अधिभोग के गुणकों से समायोजित किया जाता है। उस निर्धारित मूल्य पर एक नगरपालिका कर दर लगाकर वार्षिक कर मिलता है, छूट या किसी विलंब शुल्क से पहले।",
   },
   "faq.q2": {
-    en: "What are library, health, and SWM cess, and why are they separate from my tax?",
-    hi: "पुस्तकालय, स्वास्थ्य और SWM उपकर क्या हैं, और ये मेरे कर से अलग क्यों हैं?",
+    en: "What do the use, age and occupancy factors mean?",
+    hi: "उपयोग, आयु और अधिभोग के गुणकों का क्या मतलब है?",
   },
   "faq.a2": {
-    en: "They are fixed levies bundled into your total tax that fund specific municipal services — libraries, primary health and sanitation, and solid-waste collection. A real bill folds them into one rate. This app shows them on their own lines so you can see what each rupee actually funds, instead of one unexplained lump sum.",
-    hi: "ये आपके कुल कर में शामिल निश्चित उगाहियाँ हैं जो विशिष्ट नगरपालिका सेवाओं का वित्तपोषण करती हैं — पुस्तकालय, प्राथमिक स्वास्थ्य और स्वच्छता, और ठोस-अपशिष्ट संग्रह। असली बिल इन्हें एक दर में समेट देता है। यह ऐप इन्हें अलग-अलग पंक्तियों में दिखाता है ताकि आप देख सकें कि हर रुपया वाकई किस चीज़ का वित्तपोषण करता है, एक अस्पष्ट एकमुश्त राशि के बजाय।",
+    en: "They adjust the assessed value to fit the property. The use factor reflects how the property is used, such as a home or a small shop; the age factor lowers the value of older buildings; and the occupancy factor reflects how the property is occupied, such as self-occupied. The factors and rates in this prototype are illustrative — a real bill uses your municipality's own.",
+    hi: "ये निर्धारित मूल्य को संपत्ति के अनुसार समायोजित करते हैं। उपयोग गुणक बताता है कि संपत्ति कैसे इस्तेमाल होती है, जैसे आवास या छोटी दुकान; आयु गुणक पुराने भवनों का मूल्य घटाता है; और अधिभोग गुणक संपत्ति के अधिभोग की स्थिति दर्शाता है, जैसे स्व-अधिकृत। इस प्रोटोटाइप में गुणक और दरें केवल उदाहरण हैं — असली बिल में आपकी नगरपालिका की अपनी दरें होती हैं।",
   },
   "faq.q3": { en: "I think my bill has an error — what do I do?", hi: "मुझे लगता है मेरे बिल में गलती है — मैं क्या करूँ?" },
   "faq.a3": {
