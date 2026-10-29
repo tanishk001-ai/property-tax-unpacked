@@ -360,7 +360,7 @@ function DetailCard({ title, children, tone }: { title: string; children: ReactN
   return <section className={`detail-card ${tone ? `detail-${tone}` : ""}`}><div className="detail-card-title">{tone === "saving" ? <Icon name="info" /> : tone === "warning" ? <Icon name="warning" /> : <Icon name="receipt" />}<h3>{title}</h3></div>{children}</section>;
 }
 
-function Breakdown({ property, onBack, onHome, onPay, onDispute }: { property: Property; onBack: () => void; onHome: () => void; onPay: () => void; onDispute: (line?: DisputeId) => void }) {
+function Breakdown({ property, paid, onBack, onHome, onPay, onDispute }: { property: Property; paid: boolean; onBack: () => void; onHome: () => void; onPay: () => void; onDispute: (line?: DisputeId) => void }) {
   const { t, lang } = useI18n();
   const amounts = useMemo(() => calc(property), [property]);
   const [openLine, setOpenLine] = useState<string | null>(null);
@@ -422,7 +422,7 @@ function Breakdown({ property, onBack, onHome, onPay, onDispute }: { property: P
         </section>
         <section className="next-step"><div><span className="eyebrow"><span className="eyebrow-dot" />{t("next.eyebrow")}</span><h2>{t("next.h2")}</h2><p>{t("next.body")}</p></div><button className="button button-outline" onClick={() => onDispute()} type="button">{t("action.raiseDispute")} <Arrow /></button></section>
       </main>
-      <BottomActions onExplain={() => window.scrollTo({ top: 0, behavior: "smooth" })} onPay={onPay} onDispute={() => onDispute()} />
+      <BottomActions onExplain={() => window.scrollTo({ top: 0, behavior: "smooth" })} onPay={onPay} onDispute={() => onDispute()} paid={paid} />
       <footer className="page-footer page-width"><PrototypeNote compact /></footer>
     </>
   );
@@ -583,5 +583,5 @@ export function BillScreen({ id, view }: { id: string; view: View }) {
   function openDispute(line?: DisputeId) { setDisputeLine(line); setDisputeKey((n) => n + 1); setModal("dispute"); }
   const toLanding = () => session.goUp("/");
 
-  return <div className="app-shell">{view === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={openBreakdown} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={toLanding} onHome={toLanding} /> : <Breakdown property={property} onBack={() => session.goUp(billPath(id))} onHome={toLanding} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); session.setPayment(id, result); if (view === "breakdown") router.push(billPath(id)); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
+  return <div className="app-shell">{view === "bill" ? <BillSummary property={property} paid={paid} lastPayment={lastPayment} onExplain={openBreakdown} onPay={() => setModal("payment")} onDispute={() => openDispute()} onBack={toLanding} onHome={toLanding} /> : <Breakdown property={property} paid={paid} onBack={() => session.goUp(billPath(id))} onHome={toLanding} onPay={() => setModal("payment")} onDispute={openDispute} />}<AnimatePresence>{modal === "payment" && <PaymentModal property={property} onClose={() => setModal(null)} onPaid={(result) => { setModal(null); session.setPayment(id, result); if (view === "breakdown") router.push(billPath(id)); }} />}{modal === "dispute" && <DisputeModal property={property} initialLine={disputeLine} resetKey={disputeKey} onClose={() => setModal(null)} />}</AnimatePresence></div>;
 }
