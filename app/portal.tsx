@@ -294,7 +294,7 @@ function BillSummary({ property, onExplain, onPay, onDispute, onBack, onHome, pa
               {paid ? (hasSaving ? t("bill.status.paidRebate") : t("bill.status.paid")) : translateData(lang, property.status)}
             </div>
             <p className="address">{formatAddress(lang, property.address)}</p>
-            <h1 id="bill-title">{t("bill.title", property.fy)}</h1>
+            <h1 id="bill-title" tabIndex={-1}>{t("bill.title", property.fy)}</h1>
           </div>
           <div className="amount-panel">
             <span>{paid ? t("bill.paidSimulated") : t("bill.amountDue")}</span>
@@ -619,6 +619,13 @@ export function BillScreen({ id, view }: { id: string; view: View }) {
   const lastPayment = session.payments[id] ?? null;
   const paid = lastPayment !== null;
   const tracked = useRef(false);
+
+  // The button that opened the payment dialog is replaced by "Payment simulated", so
+  // when the payment lands put keyboard and screen-reader focus on the bill heading
+  // rather than letting it fall back to the top of the page.
+  useEffect(() => {
+    if (paid && view === "bill") document.getElementById("bill-title")?.focus();
+  }, [paid, view]);
 
   // Arrived from a sample card or a search => that source; first page of the visit
   // (a shared or bookmarked link) => "deeplink"; browser back/forward => nothing.
