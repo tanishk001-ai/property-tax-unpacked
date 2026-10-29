@@ -187,13 +187,10 @@ function PrototypeNote({ compact = false }: { compact?: boolean }) {
   );
 }
 
-const MotionLink = motion.create(Link);
-
 function Lookup({ onChoose, onPrepare, notFound, onClearNotFound }: { onChoose: (property: Property, source: "sample" | "search") => void; onPrepare: (property: Property, source: "sample") => void; notFound: boolean; onClearNotFound: () => void }) {
   const { t, lang } = useI18n();
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
-  const reduced = useReducedMotion();
   const shownError = error || (notFound ? t("lookup.error") : "");
 
   function submit(event: FormEvent) {
@@ -217,11 +214,11 @@ function Lookup({ onChoose, onPrepare, notFound, onClearNotFound }: { onChoose: 
         </div>
       </nav>
       <section className="landing-hero" aria-labelledby="landing-title">
-        <motion.div initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={spring} className="eyebrow"><span className="eyebrow-dot" />{t("landing.eyebrow")}</motion.div>
-        <motion.h1 id="landing-title" initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.05 }}>{t("landing.title")}</motion.h1>
-        <motion.p initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.1 }}>{t("landing.sub")}</motion.p>
+        <div className="eyebrow rise"><span className="eyebrow-dot" />{t("landing.eyebrow")}</div>
+        <h1 id="landing-title" className="rise" style={{ animationDelay: "50ms" }}>{t("landing.title")}</h1>
+        <p className="rise" style={{ animationDelay: "100ms" }}>{t("landing.sub")}</p>
 
-        <motion.form onSubmit={submit} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.15 }} className="lookup-card">
+        <form onSubmit={submit} className="lookup-card rise" style={{ animationDelay: "150ms" }}>
           <label htmlFor="property-id">{t("lookup.label")}</label>
           <div className="lookup-controls">
             <input id="property-id" value={value} onChange={(event) => { setValue(event.target.value.toUpperCase()); setError(""); onClearNotFound(); }} placeholder={t("lookup.placeholder")} autoCapitalize="characters" aria-describedby={shownError ? "lookup-error" : undefined} />
@@ -231,18 +228,18 @@ function Lookup({ onChoose, onPrepare, notFound, onClearNotFound }: { onChoose: 
             <button className="text-button" type="button" onClick={() => onChoose(properties[1], "sample")}>{t("lookup.trySample")} <Arrow /></button>
             {shownError ? <span id="lookup-error" className="form-error" role="alert">{shownError}</span> : <span>{t("lookup.hint")}</span>}
           </div>
-        </motion.form>
+        </form>
       </section>
 
       <section className="sample-section" aria-labelledby="samples-title">
         <div className="section-kicker"><span>{t("samples.kicker")}</span><h2 id="samples-title">{t("samples.title")}</h2></div>
         <div className="sample-grid">
           {properties.map((property, index) => (
-            <MotionLink key={property.id} href={billPath(property.id)} className={`sample-card sample-${property.tone}`} onClick={(event) => { if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; onPrepare(property, "sample"); }} initial={reduced ? { opacity: 0 } : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.2 + index * 0.06 }}>
+            <Link key={property.id} href={billPath(property.id)} className={`sample-card sample-${property.tone} rise`} style={{ animationDelay: `${200 + index * 60}ms` }} onClick={(event) => { if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; onPrepare(property, "sample"); }}>
               <span className="sample-index">0{index + 1}</span>
               <span className="sample-copy"><strong>{translateData(lang, property.label)}</strong><small>{property.id}</small></span>
               <Arrow />
-            </MotionLink>
+            </Link>
           ))}
         </div>
       </section>
