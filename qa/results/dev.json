@@ -1,0 +1,752 @@
+{
+ "env": "dev",
+ "at": "2026-10-29T10:05:22.239Z",
+ "results": {
+  "RT-01": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "RT-02": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "RT-03": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "RT-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-05": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-07": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-08": {
+   "pass": true,
+   "details": [],
+   "checks": 2,
+   "notes": [
+    "/bill/DEMO-7719/breakdown/extra -> 404, branded=true"
+   ]
+  },
+  "RT-09": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "[[308,\"/bill//breakdown\"],[200,\"/bill/breakdown\"]]"
+   ]
+  },
+  "RT-11": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-12": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-13": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "final 200 /bill/%2544EMO-7719"
+   ]
+  },
+  "RT-14": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "RT-15": {
+   "pass": true,
+   "details": [],
+   "checks": 9
+  },
+  "RT-16": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "41 URLs checked, max hops 1"
+   ]
+  },
+  "RT-18": {
+   "pass": true,
+   "details": [],
+   "checks": 6,
+   "notes": [
+    "/bill/DEMO-7719/Breakdown -> [[404,\"/bill/DEMO-7719/Breakdown\"]]",
+    "/BILL/DEMO-7719 -> [[404,\"/BILL/DEMO-7719\"]]",
+    "/Bill/DEMO-7719 -> [[404,\"/Bill/DEMO-7719\"]]",
+    "/bill/DEMO-7719/BREAKDOWN -> [[404,\"/bill/DEMO-7719/BREAKDOWN\"]]",
+    "/Faq -> [[404,\"/Faq\"]]",
+    "/TERMS -> [[404,\"/TERMS\"]]"
+   ]
+  },
+  "RT-19": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-20": {
+   "pass": true,
+   "details": [],
+   "checks": 0,
+   "notes": [
+    "/robots.txt -> 404",
+    "/favicon.ico -> 404"
+   ]
+  },
+  "LK-01": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "LK-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-05": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-12": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-07": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-09": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LK-13": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "LK-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-11": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-14": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-15": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LK-16": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "BL-01": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BL-11": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BL-04": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "BL-05": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "BL-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "BL-07": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BL-08": {
+   "pass": true,
+   "details": [],
+   "checks": 15
+  },
+  "BL-10": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "BL-09": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "NM-04": {
+   "pass": true,
+   "details": [],
+   "checks": 15
+  },
+  "BD-03": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BD-01": {
+   "pass": true,
+   "details": [],
+   "checks": 18
+  },
+  "BD-02": {
+   "pass": true,
+   "details": [],
+   "checks": 13
+  },
+  "BD-06": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BD-07": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BD-08": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "BD-04": {
+   "pass": true,
+   "details": [],
+   "checks": 44
+  },
+  "BD-05": {
+   "pass": true,
+   "details": [],
+   "checks": 16
+  },
+  "BL-02": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "BL-03": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "NM-01": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NM-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NM-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-01": {
+   "pass": true,
+   "details": [],
+   "checks": 41
+  },
+  "DP-02": {
+   "pass": true,
+   "details": [],
+   "checks": 19
+  },
+  "DP-03": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "DP-13": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "DP-04": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "DP-12": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-05": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-07": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-08": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "DP-11": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "DP-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-09": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-10": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RB-03": {
+   "pass": true,
+   "details": [],
+   "checks": 20
+  },
+  "PY-01": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-02": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-03": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-04": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "PY-07": {
+   "pass": true,
+   "details": [],
+   "checks": 16
+  },
+  "PY-09": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "PY-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-11": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-12": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-13": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-05": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "PY-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-15": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "PY-16": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "NV-01": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-05": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-04": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "NV-07": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "AN-03": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "AN-01": {
+   "pass": true,
+   "details": [],
+   "checks": 12
+  },
+  "AN-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "AN-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "0 POST/body requests observed, all to http://localhost:3100"
+   ]
+  },
+  "RB-05": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LG-01": {
+   "pass": true,
+   "details": [],
+   "checks": 12
+  },
+  "LG-08": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "LG-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LG-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LG-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LG-05": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "LG-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "Hindi reader, deep link: English headline first visible at 53ms, Hindi at 407ms (fast local connection)"
+   ]
+  },
+  "LG-07": {
+   "pass": true,
+   "details": [],
+   "checks": 5
+  },
+  "FQ-01": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LG-06": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "FQ-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "FQ-03": {
+   "pass": true,
+   "details": [],
+   "checks": 7
+  },
+  "LY-01": {
+   "pass": true,
+   "details": [],
+   "checks": 14
+  },
+  "LG-09": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "LY-02": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "LY-05": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "LY-03": {
+   "pass": true,
+   "details": [],
+   "checks": 8
+  },
+  "LY-04": {
+   "pass": true,
+   "details": [],
+   "checks": 16
+  },
+  "LY-06": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "LY-07": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "AX-01": {
+   "pass": true,
+   "details": [],
+   "checks": 9,
+   "notes": [
+    "landing tab order: button.is-active \"EN\" → button. \"हिं\" → input. \"e.g. DEMO-7719\" → button.button \"View bill →\" → button.text-button \"Try a sample property \" → a.sample-card \"01A clear, paid-on-tim\" → a.sample-card \"02A bill with a missed\" → a.sample-card \"03An overdue bill with\" → a.prototype-note-link \"Full terms\" → a.prototype-note-link \"FAQ\" → nextjs-portal. \"\" → body. \"UnpackedProperty bill,\" → button.is-active \"EN\" → button. \"हिं\""
+   ]
+  },
+  "AX-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "AX-05": {
+   "pass": true,
+   "details": [],
+   "checks": 11
+  },
+  "AX-04": {
+   "pass": true,
+   "details": [],
+   "checks": 8
+  },
+  "AX-03": {
+   "pass": true,
+   "details": [],
+   "checks": 8
+  },
+  "AX-06": {
+   "pass": true,
+   "details": [],
+   "checks": 28,
+   "notes": [
+    "no moderate/minor axe findings"
+   ]
+  },
+  "AX-07": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "0 text runs below WCAG AA by own measurement"
+   ]
+  },
+  "AX-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RB-01": {
+   "pass": true,
+   "details": [],
+   "checks": 9
+  },
+  "RB-02": {
+   "pass": true,
+   "details": [],
+   "checks": 24,
+   "notes": [
+    "first contentful paint under Slow 3G + 6× CPU (all six deep links): 2056, 2264, 2480, 2560, 2456, 2460 ms"
+   ]
+  },
+  "RB-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "browser-level 'blocked by client' resource errors are expected and excluded"
+   ]
+  },
+  "SH-01": {
+   "pass": true,
+   "details": [],
+   "checks": 6,
+   "notes": [
+    "en: {\"landing\":\"Unpacked · Property bill explainer\",\"bill\":\"DEMO-7719 · Your bill · Unpacked\",\"breakdown\":\"DEMO-7719 · Why this amount? · Unpacked\",\"faq\":\"Common questions · Unpacked\",\"terms\":\"Terms · Unpacked\"}",
+    "hi: {\"landing\":\"Unpacked · संपत्ति बिल की व्याख्या\",\"bill\":\"DEMO-7719 · आपका बिल · Unpacked\",\"breakdown\":\"DEMO-7719 · यह राशि क्यों? · Unpacked\",\"faq\":\"सामान्य प्रश्न · Unpacked\",\"terms\":\"शर्तें · Unpacked\"}"
+   ]
+  },
+  "SH-02": {
+   "pass": true,
+   "details": [],
+   "checks": 10,
+   "notes": [
+    "/: {\"title\":\"Unpacked · Property bill explainer\",\"ogTitle\":\"Unpacked · Property bill explainer\",\"ogDesc\":\"An independent hackathon prototype for understandable property tax bills.\",\"ogImage\":\"http://localhost:3100/opengraph-image?074bdaebbdf1d30c\",\"ogUrl\":\"http://localhost:3000\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3100/twitter-image?fac65c47b6ecdb89\",\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/bill/DEMO-7719: {\"title\":\"DEMO-7719 · Your bill · Unpacked\",\"ogTitle\":\"DEMO-7719 · Your bill · Unpacked\",\"ogDesc\":\"Demo property DEMO-7719 (a bill with a missed rebate): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/bill/DEMO-7719\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Demo property DEMO-7719 (a bill with a missed rebate): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\"}",
+    "/bill/DEMO-3982/breakdown: {\"title\":\"DEMO-3982 · Why this amount? · Unpacked\",\"ogTitle\":\"DEMO-3982 · Why this amount? · Unpacked\",\"ogDesc\":\"Demo property DEMO-3982 (an overdue bill with a penalty): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/bill/DEMO-3982/breakdown\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Demo property DEMO-3982 (an overdue bill with a penalty): see how an Indian property tax bill is worked out, line by line. An independent hackathon prototype with synthetic data.\"}",
+    "/faq: {\"title\":\"Common questions · Unpacked\",\"ogTitle\":\"Common questions · Unpacked\",\"ogDesc\":\"Plain answers about a property tax bill and about this prototype.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/faq\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Plain answers about a property tax bill and about this prototype.\"}",
+    "/terms: {\"title\":\"Terms · Unpacked\",\"ogTitle\":\"Terms · Unpacked\",\"ogDesc\":\"Independent hackathon prototype — synthetic and simulated data only.\",\"ogImage\":\"http://localhost:3000/opengraph-image\",\"ogUrl\":\"http://localhost:3000/terms\",\"ogType\":\"website\",\"ogSite\":\"Unpacked\",\"tw\":\"summary_large_image\",\"twImage\":\"http://localhost:3000/opengraph-image\",\"desc\":\"Independent hackathon prototype — synthetic and simulated data only.\"}"
+   ]
+  },
+  "SH-03": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "SH-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "WK-01": {
+   "pass": true,
+   "details": [],
+   "checks": 8
+  },
+  "WK-02": {
+   "pass": true,
+   "details": [],
+   "checks": 5
+  },
+  "WK-03": {
+   "pass": true,
+   "details": [],
+   "checks": 12
+  }
+ }
+}

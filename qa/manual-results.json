@@ -1,0 +1,10 @@
+{
+  "PY-14": { "pass": true, "note": "Hand-driven in the in-app browser: pay, then reload. The bill is unpaid again. Payments live in memory only. Product decision D1." },
+  "PY-06": { "pass": true, "note": "Also hand-driven in the in-app browser at a phone size: pay, press Escape on the receipt, the bill shows Paid (simulated) everywhere." },
+  "RB-02": { "pass": true, "note": "Hand-opened /bill/DEMO-3982 cold in the in-app browser at 375px: bill painted straight away, no landing page." },
+  "FQ-04": { "pass": true, "note": "Read every FAQ answer, the terms, the disclosure note and the receipt/dispute copy against the code. Two untrue statements found and fixed (BUG-04, BUG-15). Remaining open copy points are in the product decisions." },
+  "FQ-05": { "pass": true, "note": "README read line by line. Two inaccuracies fixed (missing analytics event, 'no server APIs' without the middleware)." },
+  "SH-04": { "pass": true, "note": "Descriptions read: accurate, say prototype and synthetic data." },
+  "SH-05": { "pass": false, "note": "Not run. The PR preview is behind Vercel login (HTTP 302 to vercel.com/sso-api) and I did not create a share link on your project without asking." },
+  "LY-08": { "pass": false, "note": "Not testable here: needs a real phone with its on-screen keyboard." }
+}

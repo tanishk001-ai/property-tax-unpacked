@@ -1,0 +1,877 @@
+{
+ "env": "prod-local-baseline",
+ "at": "2026-10-29T08:49:48.970Z",
+ "results": {
+  "RT-01": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "RT-02": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "RT-03": {
+   "pass": false,
+   "details": [
+    "/bill/demo-7719/ -> [[308,\"/bill/demo-7719/\"],[308,\"/bill/demo-7719\"],[200,\"/bill/DEMO-7719\"]]"
+   ],
+   "checks": 3
+  },
+  "RT-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-05": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-07": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-08": {
+   "pass": true,
+   "details": [],
+   "checks": 2,
+   "notes": [
+    "/bill/DEMO-7719/breakdown/extra -> 404, branded=true"
+   ]
+  },
+  "RT-09": {
+   "pass": false,
+   "details": [
+    "/bill/ -> [[308,\"/bill/\"],[307,\"/bill\"],[200,\"/\"]]"
+   ],
+   "checks": 2
+  },
+  "RT-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "[[308,\"/bill//breakdown\"],[200,\"/bill/breakdown\"]]"
+   ]
+  },
+  "RT-11": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-12": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RT-13": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "final 200 /bill/%2544EMO-7719"
+   ]
+  },
+  "RT-14": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "RT-15": {
+   "pass": true,
+   "details": [],
+   "checks": 9,
+   "notes": [
+    "/?id= (empty id) stays on the landing page; the first expectation in the test was wrong"
+   ]
+  },
+  "RT-16": {
+   "pass": false,
+   "details": [
+    "/bill/demo-7719/: [[308,\"/bill/demo-7719/\"],[308,\"/bill/demo-7719\"],[200,\"/bill/DEMO-7719\"]]\n/bill/: [[308,\"/bill/\"],[307,\"/bill\"],[200,\"/\"]]"
+   ],
+   "checks": 1,
+   "notes": [
+    "41 URLs checked, max hops 2"
+   ]
+  },
+  "RT-18": {
+   "pass": true,
+   "details": [],
+   "checks": 6,
+   "notes": [
+    "/bill/DEMO-7719/Breakdown -> [[404,\"/bill/DEMO-7719/Breakdown\"]]",
+    "/BILL/DEMO-7719 -> [[404,\"/BILL/DEMO-7719\"]]",
+    "/Bill/DEMO-7719 -> [[404,\"/Bill/DEMO-7719\"]]",
+    "/bill/DEMO-7719/BREAKDOWN -> [[404,\"/bill/DEMO-7719/BREAKDOWN\"]]",
+    "/Faq -> [[404,\"/Faq\"]]",
+    "/TERMS -> [[404,\"/TERMS\"]]"
+   ]
+  },
+  "RT-19": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RT-20": {
+   "pass": true,
+   "details": [],
+   "checks": 0,
+   "notes": [
+    "/robots.txt -> 404",
+    "/favicon.ico -> 404"
+   ]
+  },
+  "LK-01": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "LK-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-05": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-12": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-07": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-09": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LK-13": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "LK-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-11": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-14": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LK-15": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LK-16": {
+   "pass": false,
+   "details": [
+    "JS off: landing headline opacity 0",
+    "slow device at DOMContentLoaded: landing headline opacity 0"
+   ],
+   "checks": 2
+  },
+  "BL-01": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BL-11": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BL-04": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "BL-05": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "BL-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "BL-07": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BL-08": {
+   "pass": true,
+   "details": [],
+   "checks": 15
+  },
+  "BL-10": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "BL-09": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "NM-04": {
+   "pass": true,
+   "details": [],
+   "checks": 15
+  },
+  "BD-03": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BD-01": {
+   "pass": true,
+   "details": [],
+   "checks": 18
+  },
+  "BD-02": {
+   "pass": true,
+   "details": [],
+   "checks": 13
+  },
+  "BD-06": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BD-07": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "BD-08": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "BD-04": {
+   "pass": true,
+   "details": [],
+   "checks": 44
+  },
+  "BD-05": {
+   "pass": true,
+   "details": [],
+   "checks": 16
+  },
+  "BL-02": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "BL-03": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "NM-01": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NM-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NM-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-01": {
+   "pass": true,
+   "details": [],
+   "checks": 41
+  },
+  "DP-02": {
+   "pass": true,
+   "details": [],
+   "checks": 19
+  },
+  "DP-03": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "DP-13": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "DP-04": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "DP-12": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-05": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-07": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "DP-08": {
+   "pass": false,
+   "details": [
+    "clipboard missing: button says \"Copied\" although nothing was copied",
+    "clipboard reject: button says \"Copied\" although nothing was copied",
+    "clipboard reject: pageerror: denied"
+   ],
+   "checks": 4
+  },
+  "DP-11": {
+   "pass": false,
+   "details": [
+    "focus did not move into the dialog on open",
+    "after closing, focus is on:  | \u2192BackUnpackedPropertyDEMO-7719"
+   ],
+   "checks": 2,
+   "screenshots": [
+    "prod-local-baseline-DP-11-6.png",
+    "prod-local-baseline-DP-11-9.png"
+   ]
+  },
+  "DP-06": {
+   "pass": false,
+   "details": [
+    "after EN\u2192HI the note is: \u092e\u0948\u0902 \u0938\u0902\u092a\u0924\u094d\u0924\u093f DEMO-7719 \u092a\u0930 9-\u0935\u0930\u094d\u0937 \u092d\u0935\u0928 \u0906\u092f\u0941 \u0917\u0941\u0923\u0915 \u0915\u0940 \u0938\u092e\u0940\u0915\u094d\u0937\u093e \u091a\u093e\u0939\u0924\u093e/\u091a\u093e\u0939\u0924\u0940 \u0939\u0942\u0901\u0964 \u092e\u0941\u091d\u0947 \u0932\u0917\u0924\u093e \u0939\u0948 \u0915\u093f \u0909\u092a\u092f\u094b\u0917 \u0915\u0940 \u0917\u0908 \u091c\u093e\u0928\u0915\u093e\u0930\u0940 \u092f\u093e \u0928\u093f\u092f\u092e \u0917\u0932\u0924 \u0939\u094b \u0938\u0915\u0924\u093e \u0939\u0948\u0964"
+   ],
+   "checks": 1,
+   "screenshots": [
+    "prod-local-baseline-DP-06-7.png"
+   ]
+  },
+  "DP-09": {
+   "pass": false,
+   "details": [
+    "Escape did not close the dispute modal"
+   ],
+   "checks": 1,
+   "screenshots": [
+    "prod-local-baseline-DP-09-8.png"
+   ]
+  },
+  "DP-10": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "RB-03": {
+   "pass": true,
+   "details": [],
+   "checks": 20,
+   "notes": [
+    "two earlier failures were the intentional /nope 404 request in the Hindi scan, a test artifact"
+   ]
+  },
+  "PY-01": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-02": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-03": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-04": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "PY-07": {
+   "pass": true,
+   "details": [],
+   "checks": 16
+  },
+  "PY-09": {
+   "pass": false,
+   "details": [
+    "breakdown after paying still offers to pay: bar says \"Why this amount?Pay bill (mock) \u2192\"",
+    "breakdown after paying still offers to pay: bar says \"Why this amount?Pay bill (mock) \u2192\"",
+    "breakdown after paying still offers to pay: bar says \"Why this amount?Pay bill (mock) \u2192\""
+   ],
+   "checks": 6,
+   "screenshots": [
+    "prod-local-baseline-PY-09-10.png"
+   ]
+  },
+  "PY-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-11": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-12": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-13": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "PY-05": {
+   "pass": false,
+   "details": [
+    "closed the receipt with x: the receipt was shown (\"Simulation complete\") but the bill is still unpaid and offers Pay bill again",
+    "closed the receipt with backdrop: the receipt was shown (\"Simulation complete\") but the bill is still unpaid and offers Pay bill again"
+   ],
+   "checks": 2
+  },
+  "PY-06": {
+   "pass": false,
+   "details": [
+    "closed the receipt with escape: the receipt was shown (\"Simulation complete\") but the bill is still unpaid and offers Pay bill again"
+   ],
+   "checks": 1
+  },
+  "PY-15": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "PY-16": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "NV-01": {
+   "pass": false,
+   "details": [
+    "{\"s1\":true,\"s2\":true,\"s3\":true,\"s4\":true,\"s5\":false,\"s6\":false,\"url\":\"http://localhost:3102/\"}"
+   ],
+   "checks": 1,
+   "screenshots": [
+    "prod-local-baseline-NV-01-16.png"
+   ]
+  },
+  "NV-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-05": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-06": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "NV-04": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "NV-07": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "AN-03": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "AN-01": {
+   "pass": true,
+   "details": [],
+   "checks": 12
+  },
+  "AN-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "AN-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "0 POST/body requests observed, all to http://localhost:3102"
+   ]
+  },
+  "RB-05": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LG-01": {
+   "pass": true,
+   "details": [],
+   "checks": 12
+  },
+  "LG-08": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "LG-03": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LG-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LG-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "LG-05": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "LG-10": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "Hindi reader, deep link: English headline first visible at 7ms, Hindi at 70ms (fast local connection)"
+   ]
+  },
+  "LG-07": {
+   "pass": true,
+   "details": [],
+   "checks": 5
+  },
+  "FQ-01": {
+   "pass": true,
+   "details": [],
+   "checks": 3
+  },
+  "LG-06": {
+   "pass": false,
+   "details": [
+    "@390px: [404 page] This page could not be found.  \u27f6 This,page,could,not,be,found\n[404 page] @document.title: Unpacked \u00b7 Property bill explainer  \u27f6 Property,bill,explainer",
+    "@1366px: [404 page] This page could not be found.  \u27f6 This,page,could,not,be,found\n[404 page] @document.title: Unpacked \u00b7 Property bill explainer  \u27f6 Property,bill,explainer"
+   ],
+   "checks": 2
+  },
+  "FQ-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "FQ-03": {
+   "pass": true,
+   "details": [],
+   "checks": 7
+  },
+  "LY-01": {
+   "pass": true,
+   "details": [],
+   "checks": 14
+  },
+  "LG-09": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "LY-02": {
+   "pass": true,
+   "details": [],
+   "checks": 6
+  },
+  "LY-05": {
+   "pass": true,
+   "details": [],
+   "checks": 2
+  },
+  "LY-03": {
+   "pass": true,
+   "details": [],
+   "checks": 8
+  },
+  "LY-04": {
+   "pass": true,
+   "details": [],
+   "checks": 16
+  },
+  "LY-06": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "LY-07": {
+   "pass": true,
+   "details": [],
+   "checks": 4
+  },
+  "AX-01": {
+   "pass": false,
+   "details": [
+    "after opening the dispute dialog with the keyboard, focus is on button.question-button# \"Question this line \u2192\""
+   ],
+   "checks": 9,
+   "notes": [
+    "landing tab order: button.is-active \"EN\" \u2192 button. \"\u0939\u093f\u0902\" \u2192 input. \"e.g. DEMO-7719\" \u2192 button.button \"View bill \u2192\" \u2192 button.text-button \"Try a sample property \" \u2192 a.sample-card \"01A clear, paid-on-tim\" \u2192 a.sample-card \"02A bill with a missed\" \u2192 a.sample-card \"03An overdue bill with\" \u2192 a.prototype-note-link \"Full terms\" \u2192 a.prototype-note-link \"FAQ\" \u2192 body. \"UnpackedProperty bill,\" \u2192 button.is-active \"EN\" \u2192 button. \"\u0939\u093f\u0902\" \u2192 input. \"e.g. DEMO-7719\""
+   ],
+   "screenshots": [
+    "prod-local-baseline-AX-01-21.png"
+   ]
+  },
+  "AX-02": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "AX-05": {
+   "pass": false,
+   "details": [
+    "Hindi toggle has no lang attribute or label: {\"text\":\"\u0939\u093f\u0902\",\"label\":null,\"lang\":null}"
+   ],
+   "checks": 11,
+   "screenshots": [
+    "prod-local-baseline-AX-05-38.png"
+   ]
+  },
+  "AX-04": {
+   "pass": false,
+   "details": [
+    "dispute form: dialog semantics {\"modal\":\"true\",\"name\":\"\"}",
+    "dispute form: Tab left the dialog 10 times (focus ended on button.# \"All properties\")",
+    "dispute confirmation: dialog semantics {\"modal\":\"true\",\"name\":\"\"}",
+    "dispute confirmation: Tab left the dialog 11 times (focus ended on button.button# \"Pay bill (mock) \u2192\")",
+    "payment: dialog semantics {\"modal\":\"true\",\"name\":\"\"}",
+    "payment: Tab left the dialog 10 times (focus ended on button.button# \"Why this amount? \u2192\")",
+    "receipt: dialog semantics {\"modal\":\"true\",\"name\":\"\"}",
+    "receipt: Tab left the dialog 13 times (focus ended on a.prototype-note-link# \"FAQ\")"
+   ],
+   "checks": 8,
+   "screenshots": [
+    "prod-local-baseline-AX-04-22.png",
+    "prod-local-baseline-AX-04-23.png",
+    "prod-local-baseline-AX-04-26.png",
+    "prod-local-baseline-AX-04-27.png",
+    "prod-local-baseline-AX-04-30.png",
+    "prod-local-baseline-AX-04-31.png",
+    "prod-local-baseline-AX-04-34.png",
+    "prod-local-baseline-AX-04-35.png"
+   ]
+  },
+  "AX-03": {
+   "pass": false,
+   "details": [
+    "dispute form: Escape did not close the dialog",
+    "dispute form: focus did not return to the trigger; it is on body",
+    "dispute confirmation: Escape did not close the dialog",
+    "dispute confirmation: focus did not return to the trigger; it is on body",
+    "payment: Escape did not close the dialog",
+    "payment: focus did not return to the trigger; it is on body",
+    "receipt: Escape did not close the dialog",
+    "receipt: after closing, focus is lost to <body>"
+   ],
+   "checks": 8,
+   "screenshots": [
+    "prod-local-baseline-AX-03-24.png",
+    "prod-local-baseline-AX-03-25.png",
+    "prod-local-baseline-AX-03-28.png",
+    "prod-local-baseline-AX-03-29.png",
+    "prod-local-baseline-AX-03-32.png",
+    "prod-local-baseline-AX-03-33.png",
+    "prod-local-baseline-AX-03-36.png"
+   ]
+  },
+  "AX-06": {
+   "pass": false,
+   "details": [
+    "en dispute form: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "en dispute confirmation: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "en payment modal: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "en receipt: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "hi dispute form: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "hi dispute confirmation: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "hi payment modal: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty",
+    "hi receipt: aria-dialog-name (serious): .modal-card ::   aria-label attribute does not exist or is empty"
+   ],
+   "checks": 28,
+   "screenshots": [
+    "prod-local-baseline-AX-06-39.png",
+    "prod-local-baseline-AX-06-40.png",
+    "prod-local-baseline-AX-06-41.png",
+    "prod-local-baseline-AX-06-42.png",
+    "prod-local-baseline-AX-06-43.png",
+    "prod-local-baseline-AX-06-44.png",
+    "prod-local-baseline-AX-06-45.png",
+    "prod-local-baseline-AX-06-46.png"
+   ],
+   "notes": [
+    "no moderate/minor axe findings"
+   ]
+  },
+  "AX-07": {
+   "pass": false,
+   "details": [
+    "\"\u0916\u093e\u0924\u093e \u0938\u0902\u0916\u094d\u092f\u093e\" 3.03:1 (needs 4.5) in .record-hi on en /bill/DEMO-3982/breakdown\n\"\u0938\u0930\u094d\u0935\u0947 \u0938\u0902\u0916\u094d\u092f\u093e\" 3.03:1 (needs 4.5) in .record-hi on en /bill/DEMO-3982/breakdown\n\"\u0935\u093e\u0930\u094d\u0921\" 3.03:1 (needs 4.5) in .record-hi on en /bill/DEMO-3982/breakdown\n\"\u0938\u094d\u0935\u093e\u092e\u0940 \u0915\u093e \u0928\u093e\u092e\" 3.03:1 (needs 4.5) in .record-hi on en /bill/DEMO-3982/breakdown\n\"\u0938\u0930\u0915\u093e\u0930\u0940 \u0917\u093e\u0907\u0921\u0932\u093e\u0907\u0928 \u0926\u0930\" 3.03:1 (needs 4.5) in .record-hi on en /bill/DEMO-3982/breakdown\n\"\u00d7\" 3.92:1 (needs 4.5) in .i on en /bill/DEMO-3982/breakdown"
+   ],
+   "checks": 1,
+   "notes": [
+    "6 text runs below WCAG AA by own measurement"
+   ]
+  },
+  "AX-08": {
+   "pass": true,
+   "details": [],
+   "checks": 1
+  },
+  "RB-01": {
+   "pass": true,
+   "details": [],
+   "checks": 9
+  },
+  "RB-02": {
+   "pass": true,
+   "details": [],
+   "checks": 24,
+   "notes": [
+    "first contentful paint under Slow 3G + 6\u00d7 CPU (all six deep links): 1744, 1828, 1768, 1828, 1780, 1812 ms"
+   ]
+  },
+  "RB-04": {
+   "pass": true,
+   "details": [],
+   "checks": 1,
+   "notes": [
+    "browser-level 'blocked by client' resource errors are expected and excluded"
+   ]
+  },
+  "SH-01": {
+   "pass": false,
+   "details": [
+    "en: titles are not distinct per screen: {\"landing\":\"Unpacked \u00b7 Property bill explainer\",\"bill\":\"Unpacked \u00b7 Property bill explainer\",\"breakdown\":\"Unpacked \u00b7 Property bill explainer\",\"faq\":\"Common questions \u00b7 Unpacked\",\"terms\":\"Terms \u00b7 Unpacked\"}",
+    "bill/breakdown titles do not name the property: {\"landing\":\"Unpacked \u00b7 Property bill explainer\",\"bill\":\"Unpacked \u00b7 Property bill explainer\",\"breakdown\":\"Unpacked \u00b7 Property bill explainer\",\"faq\":\"Common questions \u00b7 Unpacked\",\"terms\":\"Terms \u00b7 Unpacked\"}",
+    "hi: titles are not distinct per screen: {\"landing\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"bill\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"breakdown\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"faq\":\"\u0938\u093e\u092e\u093e\u0928\u094d\u092f \u092a\u094d\u0930\u0936\u094d\u0928 \u00b7 Unpacked\",\"terms\":\"\u0936\u0930\u094d\u0924\u0947\u0902 \u00b7 Unpacked\"}",
+    "/bill/DEMO-7719: server-rendered title \"Unpacked \u00b7 Property bill explainer\" / og:title \"null\" do not name the property",
+    "/bill/DEMO-3982/breakdown: server-rendered title \"Unpacked \u00b7 Property bill explainer\" / og:title \"null\" do not name the property"
+   ],
+   "checks": 6,
+   "notes": [
+    "en: {\"landing\":\"Unpacked \u00b7 Property bill explainer\",\"bill\":\"Unpacked \u00b7 Property bill explainer\",\"breakdown\":\"Unpacked \u00b7 Property bill explainer\",\"faq\":\"Common questions \u00b7 Unpacked\",\"terms\":\"Terms \u00b7 Unpacked\"}",
+    "hi: {\"landing\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"bill\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"breakdown\":\"Unpacked \u00b7 \u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092c\u093f\u0932 \u0915\u0940 \u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e\",\"faq\":\"\u0938\u093e\u092e\u093e\u0928\u094d\u092f \u092a\u094d\u0930\u0936\u094d\u0928 \u00b7 Unpacked\",\"terms\":\"\u0936\u0930\u094d\u0924\u0947\u0902 \u00b7 Unpacked\"}"
+   ]
+  },
+  "SH-02": {
+   "pass": false,
+   "details": [
+    "/: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/bill/DEMO-7719: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/bill/DEMO-3982/breakdown: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/faq: {\"title\":\"Common questions \u00b7 Unpacked\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"Plain answers about a property tax bill and about this prototype.\"}",
+    "/terms: {\"title\":\"Terms \u00b7 Unpacked\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"Independent hackathon prototype \u2014 synthetic and simulated data only.\"}"
+   ],
+   "checks": 10,
+   "notes": [
+    "/: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/bill/DEMO-7719: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/bill/DEMO-3982/breakdown: {\"title\":\"Unpacked \u00b7 Property bill explainer\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"An independent hackathon prototype for understandable property tax bills.\"}",
+    "/faq: {\"title\":\"Common questions \u00b7 Unpacked\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"Plain answers about a property tax bill and about this prototype.\"}",
+    "/terms: {\"title\":\"Terms \u00b7 Unpacked\",\"ogTitle\":null,\"ogDesc\":null,\"ogImage\":null,\"ogUrl\":null,\"ogType\":null,\"ogSite\":null,\"tw\":null,\"twImage\":null,\"desc\":\"Independent hackathon prototype \u2014 synthetic and simulated data only.\"}"
+   ]
+  },
+  "SH-03": {
+   "pass": false,
+   "details": [
+    "no og:image on any page"
+   ],
+   "checks": 1
+  },
+  "SH-06": {
+   "pass": false,
+   "details": [
+    "icon /favicon.ico -> 404 text/html; charset=utf-8"
+   ],
+   "checks": 1
+  }
+ }
+}
