@@ -235,8 +235,8 @@ export const STR = {
   "rec.guideline": { en: "Government guideline rate", hi: "सरकारी गाइडलाइन दर" },
   "rec.guidelineValue": { en: (rate) => `${rate}/m²`, hi: (rate) => `${rate}/वर्ग मीटर` },
   "rec.guidelineNote": {
-    en: "A separate valuation reference published by the state — it does not affect this bill’s calculation.",
-    hi: "राज्य द्वारा प्रकाशित एक अलग मूल्यांकन संदर्भ — यह इस बिल की गणना को प्रभावित नहीं करता।",
+    en: "A separate reference valuation (illustrative in this prototype) — it does not affect this bill’s calculation.",
+    hi: "एक अलग संदर्भ मूल्यांकन (इस प्रोटोटाइप में काल्पनिक) — यह इस बिल की गणना को प्रभावित नहीं करता।",
   },
   "rel.S/O": { en: "S/O", hi: "पुत्र" },
   "rel.D/O": { en: "D/O", hi: "पुत्री" },
@@ -286,9 +286,9 @@ export const STR = {
   // ---- calculation line detail text ----
   "det.area": {
     en: (area, uav, total) =>
-      `Your recorded built-up area is ${area} square metres. The zone's published unit-area value is ${uav} per square metre per month. Together, they produce an annual assessed value of ${total} before property-specific factors.`,
+      `Your recorded built-up area is ${area} square metres. The zone's unit-area value in this prototype is ${uav} per square metre per month. Together, they produce an annual assessed value of ${total} before property-specific factors.`,
     hi: (area, uav, total) =>
-      `आपका दर्ज निर्मित क्षेत्र ${area} वर्ग मीटर है। इस क्षेत्र का प्रकाशित इकाई-क्षेत्र मूल्य ${uav} प्रति वर्ग मीटर प्रति माह है। मिलकर, ये संपत्ति-विशिष्ट गुणकों से पहले ${total} का वार्षिक निर्धारित मूल्य देते हैं।`,
+      `आपका दर्ज निर्मित क्षेत्र ${area} वर्ग मीटर है। इस प्रोटोटाइप में इस क्षेत्र का इकाई-क्षेत्र मूल्य ${uav} प्रति वर्ग मीटर प्रति माह है। मिलकर, ये संपत्ति-विशिष्ट गुणकों से पहले ${total} का वार्षिक निर्धारित मूल्य देते हैं।`,
   },
   "det.useFactor": {
     en: (use, f, val) =>
@@ -453,8 +453,8 @@ export const STR = {
   "terms.title": { en: "Terms", hi: "शर्तें" },
   "terms.back": { en: "Back", hi: "वापस" },
   "terms.body": {
-    en: "This is an independent hackathon prototype, not a government product or service. All property records, calculations, and payments shown are synthetic and simulated — no real data is collected, stored, or transmitted, and no payment gateway is contacted. Nothing here should be relied on as an actual property tax record.",
-    hi: "यह एक स्वतंत्र हैकाथॉन प्रोटोटाइप है, कोई सरकारी उत्पाद या सेवा नहीं। दिखाए गए सभी संपत्ति रिकॉर्ड, गणनाएँ और भुगतान काल्पनिक और सिम्युलेटेड हैं — कोई वास्तविक डेटा एकत्र, संग्रहीत या प्रेषित नहीं किया जाता, और किसी भुगतान गेटवे से संपर्क नहीं किया जाता। यहाँ किसी भी चीज़ को वास्तविक संपत्ति कर रिकॉर्ड के रूप में भरोसे में नहीं लेना चाहिए।",
+    en: "This is an independent hackathon prototype, not a government product or service. All property records, calculations, and payments shown are synthetic and simulated: no real property data is used, nothing you type into the forms is stored or sent anywhere, and no payment gateway is contacted. The site keeps only your language choice, in your own browser, and counts anonymous usage (page views and which buttons are used, such as which demo bill was opened) without cookies or personal data. Nothing here should be relied on as an actual property tax record.",
+    hi: "यह एक स्वतंत्र हैकाथॉन प्रोटोटाइप है, कोई सरकारी उत्पाद या सेवा नहीं। दिखाए गए सभी संपत्ति रिकॉर्ड, गणनाएँ और भुगतान काल्पनिक और सिम्युलेटेड हैं: कोई वास्तविक संपत्ति डेटा इस्तेमाल नहीं होता, फ़ॉर्म में आप जो लिखते हैं वह कहीं सहेजा या भेजा नहीं जाता, और किसी भुगतान गेटवे से संपर्क नहीं किया जाता। साइट केवल आपकी भाषा की पसंद आपके अपने ब्राउज़र में रखती है, और बिना कुकी या व्यक्तिगत जानकारी के गुमनाम उपयोग गिनती है (पेज व्यूज़ और कौन-से बटन इस्तेमाल हुए, जैसे कौन-सा डेमो बिल खोला गया)। यहाँ किसी भी चीज़ को वास्तविक संपत्ति कर रिकॉर्ड के रूप में भरोसे में नहीं लेना चाहिए।",
   },
 
   // ---- /faq ----
@@ -466,8 +466,8 @@ export const STR = {
   "faq.back": { en: "Back", hi: "वापस" },
   "faq.q1": { en: "How is my property tax calculated?", hi: "मेरा संपत्ति कर कैसे निकाला जाता है?" },
   "faq.a1": {
-    en: "It uses the unit-area method shown in “Why this amount?”: your built-up area is multiplied by a published per-square-metre value, then adjusted by factors for use, building age and occupancy. A municipal tax rate is applied to that assessed value to get the annual tax, before rebates or any late fee.",
-    hi: "यह “यह राशि क्यों?” में दिखाई गई इकाई-क्षेत्र विधि का उपयोग करता है: आपके निर्मित क्षेत्र को प्रति वर्ग मीटर के प्रकाशित मूल्य से गुणा किया जाता है, फिर उपयोग, भवन की आयु और अधिभोग के गुणकों से समायोजित किया जाता है। उस निर्धारित मूल्य पर एक नगरपालिका कर दर लगाकर वार्षिक कर मिलता है, छूट या किसी विलंब शुल्क से पहले।",
+    en: "It uses the unit-area method shown in “Why this amount?”: your built-up area is multiplied by the zone’s per-square-metre value, then adjusted by factors for use, building age and occupancy. A municipal tax rate is applied to that assessed value to get the annual tax, before rebates or any late fee.",
+    hi: "यह “यह राशि क्यों?” में दिखाई गई इकाई-क्षेत्र विधि का उपयोग करता है: आपके निर्मित क्षेत्र को क्षेत्र के प्रति वर्ग मीटर मूल्य से गुणा किया जाता है, फिर उपयोग, भवन की आयु और अधिभोग के गुणकों से समायोजित किया जाता है। उस निर्धारित मूल्य पर एक नगरपालिका कर दर लगाकर वार्षिक कर मिलता है, छूट या किसी विलंब शुल्क से पहले।",
   },
   "faq.q2": {
     en: "What do the use, age and occupancy factors mean?",
